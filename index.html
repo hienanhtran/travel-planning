@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sổ tay Thượng Hải Hàng Châu</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sổ tay TQ">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2FAE8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E190A" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+/* Layout: mobile app — sticky header, one scrolling view per tab, fixed bottom tab bar, bottom-sheet forms. Motif: perforated postage stamps. */
+:root{
+  --bg:#F2FAE8; --surface:#FFFFFF; --surface-2:#E4F5D1; --line:#CDE6B5;
+  --ink:#1D3812; --ink-soft:#557047;
+  --lime:#8CD234; --on-lime:#16300A; --grass:#3D9A1E; --grass-ink:#2F7E14;
+  --lilac:#B786F1; --lilac-deep:#7B4CCF; --lilac-soft:#F0E4FF;
+  --hero-bg:#3D9A1E; --hero-ink:#E9F9D9; --hero-accent:#D9B8FF; --hero-num:#8CD234; --hero-num-ink:#16300A;
+  --hero2-bg:#B786F1; --hero2-ink:#1E0F38; --hero2-accent:#F2FFE6; --hero2-num:#1D5C0A; --hero2-num-ink:#FFFFFF;
+  --pc-bg:#DCF2C6; --pc-ink:#1D3812; --pc-zh:#7B4CCF; --pc-btn:#3D9A1E; --pc-btn-ink:#FFFFFF;
+  --pc2-bg:#ECE0FC; --pc2-ink:#2A1A4A; --pc2-zh:#3D9A1E; --pc2-btn:#7B4CCF; --pc2-btn-ink:#FFFFFF;
+  --warn-bg:#FFF2CC; --warn-ink:#7A5200;
+  --danger:#C8392F; --shadow:0 1px 0 rgba(29,56,18,.06),0 6px 18px -10px rgba(29,56,18,.35);
+  --f-display:ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Segoe UI",system-ui,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,sans-serif;
+  --f-zh:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E190A; --surface:#162612; --surface-2:#1E3318; --line:#2B4622;
+  --ink:#E6F6D6; --ink-soft:#A3C293;
+  --lime:#9BE042; --on-lime:#11250A; --grass:#6CC23E; --grass-ink:#8FD866;
+  --lilac:#C6A0F6; --lilac-deep:#C6A0F6; --lilac-soft:#2C2240;
+  --hero-bg:#2A6E14; --hero-ink:#E9F9D9; --hero-accent:#D9B8FF; --hero-num:#9BE042; --hero-num-ink:#11250A;
+  --hero2-bg:#4A2E78; --hero2-ink:#F3EAFF; --hero2-accent:#D7F7B8; --hero2-num:#9BE042; --hero2-num-ink:#11250A;
+  --pc-bg:#1E3518; --pc-ink:#E6F6D6; --pc-zh:#C6A0F6; --pc-btn:#7CC24E; --pc-btn-ink:#11250A;
+  --pc2-bg:#2A2240; --pc2-ink:#F0E6FF; --pc2-zh:#A9D97A; --pc2-btn:#B995EE; --pc2-btn-ink:#1E0F38;
+  --warn-bg:#3A2F12; --warn-ink:#F5D27A;
+  --danger:#FF7B6F; --shadow:0 6px 18px -10px rgba(0,0,0,.7); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E190A; --surface:#162612; --surface-2:#1E3318; --line:#2B4622;
+  --ink:#E6F6D6; --ink-soft:#A3C293;
+  --lime:#9BE042; --on-lime:#11250A; --grass:#6CC23E; --grass-ink:#8FD866;
+  --lilac:#C6A0F6; --lilac-deep:#C6A0F6; --lilac-soft:#2C2240;
+  --hero-bg:#2A6E14; --hero-ink:#E9F9D9; --hero-accent:#D9B8FF; --hero-num:#9BE042; --hero-num-ink:#11250A;
+  --hero2-bg:#4A2E78; --hero2-ink:#F3EAFF; --hero2-accent:#D7F7B8; --hero2-num:#9BE042; --hero2-num-ink:#11250A;
+  --pc-bg:#1E3518; --pc-ink:#E6F6D6; --pc-zh:#C6A0F6; --pc-btn:#7CC24E; --pc-btn-ink:#11250A;
+  --pc2-bg:#2A2240; --pc2-ink:#F0E6FF; --pc2-zh:#A9D97A; --pc2-btn:#B995EE; --pc2-btn-ink:#1E0F38;
+  --warn-bg:#3A2F12; --warn-ink:#F5D27A;
+  --danger:#FF7B6F; --shadow:0 6px 18px -10px rgba(0,0,0,.7); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+.zh{font-family:var(--f-zh)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:12px 10px}
+.top h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.1;flex:1;min-width:0;letter-spacing:-.01em}
+.top h1 small{display:block;font-family:var(--f-body);font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase}
+.icon-btn{width:44px;height:44px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+.icon-btn svg{width:22px;height:22px}
+.sync{font-size:12px;color:var(--ink-soft);padding:0 0 6px}
+.sync[hidden]{display:none}
+
+main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.view{display:flex;flex-direction:column;gap:18px;padding-block:4px 8px}
+
+/* stamp */
+.stamp{--r:6px;-webkit-mask:radial-gradient(var(--r),#0000 97%,#000) round calc(-1.5*var(--r)) calc(-1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)),linear-gradient(#000 0 0) no-repeat 50%/calc(100% - 3*var(--r)) calc(100% - 3*var(--r));mask:radial-gradient(var(--r),#0000 97%,#000) round calc(-1.5*var(--r)) calc(-1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)),linear-gradient(#000 0 0) no-repeat 50%/calc(100% - 3*var(--r)) calc(100% - 3*var(--r))}
+
+.hero{background:var(--hero-bg);color:var(--hero-ink);padding:30px 26px 26px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;opacity:.18;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hero-zh{font-family:var(--f-zh);font-weight:900;font-size:clamp(46px,15vw,72px);line-height:.95;color:var(--hero-accent);letter-spacing:.02em;display:flex;gap:.18em;align-items:baseline}
+.hero-zh i{font-style:normal;font-size:.45em;color:var(--hero-ink);opacity:.7}
+.hero-title{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.15;margin:10px 0 2px}
+.hero-dates{font-size:14px;opacity:.9}
+.count{margin-top:18px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.count b{font-family:var(--f-display);font-weight:800;font-size:56px;line-height:.85;color:var(--hero-num)}
+.hero.alt{--hero-bg:var(--hero2-bg);--hero-ink:var(--hero2-ink);--hero-accent:var(--hero2-accent);--hero-num:var(--hero2-num);--hero-num-ink:var(--hero2-num-ink)}
+
+/* place card = small soft stamp: pale mint (Thượng Hải) / pale lilac (Hàng Châu) */
+.pcard{--r:5px;--hero-bg:var(--pc-bg);--hero-ink:var(--pc-ink);--hero-accent:var(--pc-zh);--hero-num:var(--pc-btn);--hero-num-ink:var(--pc-btn-ink);background:var(--hero-bg);color:var(--hero-ink);padding:22px 20px 20px;position:relative;display:flex;flex-direction:column;gap:10px}
+.pcard.alt{--hero-bg:var(--pc2-bg);--hero-ink:var(--pc2-ink);--hero-accent:var(--pc2-zh);--hero-num:var(--pc2-btn);--hero-num-ink:var(--pc2-btn-ink)}
+.pcard::after{content:"";position:absolute;inset:0;opacity:.35;mix-blend-mode:soft-light;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.pcard > *{position:relative;z-index:1}
+.pcard.done{opacity:.72}
+.pcard .card-top{display:flex;gap:10px;align-items:flex-start}
+.pcard .pc-zh{font-family:var(--f-zh);font-weight:900;font-size:clamp(30px,9vw,40px);line-height:1.05;color:var(--hero-accent);letter-spacing:.02em;overflow-wrap:anywhere}
+.pcard .pc-name{font-family:var(--f-display);font-weight:800;font-size:19px;line-height:1.2;margin:4px 0 0}
+.pcard .pc-meta{font-size:13px;font-weight:600;opacity:.9;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.pcard .pc-meta .pill{border:1.5px solid currentColor;border-radius:99px;padding:0 8px;font-size:12px}
+.pcard .pc-meta .pill.dash{border-style:dashed;opacity:.85}
+.pcard .note{color:var(--hero-ink);opacity:.88}
+.pcard .check{background:transparent;border-color:var(--hero-ink);color:var(--hero-num-ink)}
+.pcard .check[aria-pressed="true"]{background:var(--hero-num);border-color:var(--hero-num)}
+.pcard .pm{flex:none;align-self:center;transform:rotate(-10deg);border:2.5px solid var(--hero-ink);border-radius:10px;padding:1px 8px;font-family:var(--f-display);font-weight:800;font-size:13px;letter-spacing:.08em}
+.pcard .btn.lilac{background:var(--hero-num);color:var(--hero-num-ink)}
+.pcard .btn.ghost{border-color:var(--hero-ink);color:var(--hero-ink)}
+.count span{font-weight:600;font-size:14px;padding-bottom:4px}
+.hero .btn{margin-top:16px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:999px;border:0;font-weight:700;font-size:15px;background:var(--lime);color:var(--on-lime)}
+.btn.lilac{background:var(--lilac);color:#1E0F38}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn.danger{background:transparent;border:1.5px solid var(--danger);color:var(--danger)}
+.btn.small{min-height:36px;padding:0 12px;font-size:13px}
+.btn:active{transform:translateY(1px)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:12px 12px 10px;display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+.stat b{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--ink-soft);font-weight:600}
+.bar{height:6px;border-radius:9px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--grass)}
+
+.sec{display:flex;flex-direction:column;gap:10px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sec-h h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1.2}
+.link{background:none;border:0;color:var(--grass-ink);font-weight:700;font-size:14px;padding:8px 0;min-height:40px}
+
+/* chips */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface-2);border-radius:16px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:12px;min-height:40px;font-weight:700;font-size:14px;color:var(--ink-soft)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px;padding-block:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;min-height:38px;padding:0 14px;font-weight:600;font-size:14px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;font-size:14px;color:var(--ink-soft);font-weight:600}
+.switch{display:inline-flex;align-items:center;gap:8px;background:none;border:0;min-height:40px;font-weight:600;color:var(--ink-soft)}
+.switch i{width:38px;height:22px;border-radius:99px;background:var(--line);position:relative;transition:background .15s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch[aria-pressed="true"] i{background:var(--grass)}
+.switch[aria-pressed="true"] i::after{transform:translateX(16px)}
+
+/* place cards */
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.card.done{opacity:.62}
+.card-top{display:flex;gap:12px;align-items:flex-start}
+.card-main{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.card h3{margin:0;font-size:16px;font-weight:700;line-height:1.3}
+.card.done h3{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--grass)}
+.card .zh{font-size:15px;color:var(--lilac-deep);font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--ink-soft)}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;background:var(--surface-2);color:var(--ink);font-size:12px;font-weight:600}
+.tag.city-sh{background:var(--lime);color:var(--on-lime)}
+.tag.city-hz{background:var(--lilac);color:#1E0F38}
+.tag.must{background:transparent;border:1.5px solid var(--lilac-deep);color:var(--lilac-deep)}
+.tag.sample{background:transparent;border:1.5px dashed var(--line);color:var(--ink-soft)}
+.note{font-size:14px;color:var(--ink-soft);margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.check{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0}
+.check svg{width:18px;height:18px;opacity:0}
+.check[aria-pressed="true"]{background:var(--grass);border-color:var(--grass);color:#fff}
+.check[aria-pressed="true"] svg{opacity:1}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* timeline */
+.days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px;padding-block:4px}
+.days::-webkit-scrollbar{display:none}
+.day{flex:none;width:74px;border:1.5px solid var(--line);background:var(--surface);border-radius:18px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:0;text-align:center}
+.day b{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.1}
+.day span{font-size:11px;font-weight:600;color:var(--ink-soft)}
+.day em{font-style:normal;font-size:10px;font-weight:700;margin-top:3px;padding:0 6px;border-radius:99px;background:var(--surface-2)}
+.day[aria-pressed="true"]{background:var(--grass);border-color:var(--grass);color:#fff}
+.day[aria-pressed="true"] span{color:#E9F9D9}
+.day[aria-pressed="true"] em{background:rgba(255,255,255,.2)}
+.tl{display:flex;flex-direction:column;position:relative}
+.tl-item{display:grid;grid-template-columns:52px 18px 1fr;gap:0 8px;align-items:start}
+.tl-time{font-family:var(--f-display);font-weight:700;font-size:16px;text-align:right;padding-top:14px;font-variant-numeric:tabular-nums}
+.tl-rail{position:relative;align-self:stretch}
+.tl-rail::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl-item:first-child .tl-rail::before{top:20px}
+.tl-item:last-child .tl-rail::before{bottom:calc(100% - 20px)}
+.tl-rail i{position:absolute;left:2px;top:16px;width:14px;height:14px;border-radius:50%;background:var(--lime);border:3px solid var(--bg)}
+.tl-item.past .tl-rail i{background:var(--line)}
+.tl-card{margin:6px 0;min-width:0}
+.day-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.day-head h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.15}
+.day-head p{margin:0;font-size:13px;color:var(--ink-soft);font-weight:600}
+
+/* info */
+.bk{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.bk-ico{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--lilac-soft);color:var(--lilac-deep)}
+.bk-ico svg{width:22px;height:22px}
+.code{display:inline-flex;align-items:center;gap:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:14px;letter-spacing:.06em;background:var(--surface-2);border:0;border-radius:10px;padding:6px 10px;min-height:34px}
+.ck{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
+.ck-row{display:flex;align-items:center;gap:4px;border-top:1px solid var(--line)}
+.ck-row:first-child{border-top:0}
+.ck-row > button:first-child{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:0;padding:12px 4px 12px 14px;text-align:left;min-height:52px}
+.ck-row .box{flex:none;width:24px;height:24px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center}
+.ck-row .box svg{width:15px;height:15px;opacity:0}
+.ck-row.on .box{background:var(--grass);border-color:var(--grass);color:#fff}
+.ck-row.on .box svg{opacity:1}
+.ck-row.on .txt{text-decoration:line-through;color:var(--ink-soft)}
+.x{flex:none;width:44px;height:44px;border:0;background:none;color:var(--ink-soft);font-size:20px}
+.ck-add{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--surface-2)}
+.ck-add input{flex:1;min-width:0}
+.money{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.money b{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.money span{color:var(--ink-soft);font-weight:600;font-size:14px}
+.ex-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.ex-row:first-of-type{border-top:0}
+.ex-row button.ex-main{flex:1;min-width:0;display:flex;justify-content:space-between;gap:10px;background:none;border:0;padding:0;text-align:left;min-height:40px;align-items:center}
+.ex-row .amt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.phrases{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.phrase{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
+.phrase .zh{font-size:18px;font-weight:700;color:var(--lilac-deep)}
+.phrase small{font-size:12px;color:var(--ink-soft)}
+.phrase span{font-size:13px;font-weight:600}
+.sos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sos div{background:var(--surface-2);border-radius:16px;padding:10px;text-align:center}
+.sos b{font-family:var(--f-display);font-size:26px;font-weight:800;display:block;line-height:1.1;user-select:all}
+.sos span{font-size:12px;font-weight:600;color:var(--ink-soft)}
+textarea.notes{width:100%;min-height:120px;resize:vertical}
+
+/* empty */
+.empty{border:2px dashed var(--line);border-radius:20px;padding:22px 18px;text-align:center;color:var(--ink-soft);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty b{color:var(--ink);font-size:15px}
+
+/* inputs */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:var(--ink-soft)}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=url],select,textarea{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:11px 12px;min-height:48px;font-size:16px;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 8px}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:11px;font-weight:700;color:var(--ink-soft);min-height:56px}
+.nav button i{display:grid;place-items:center;width:52px;height:30px;border-radius:99px}
+.nav button svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--ink)}
+.nav button[aria-current="page"] i{background:var(--lime);color:var(--on-lime)}
+.fab{position:fixed;z-index:7;right:max(18px,calc(env(safe-area-inset-right,0px) + 18px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:20px;border:0;background:var(--lilac);color:#1E0F38;display:grid;place-items:center;box-shadow:0 10px 24px -10px rgba(91,40,170,.7)}
+.fab svg{width:28px;height:28px}
+@media (min-width:600px){.fab{right:calc(50% - 280px + 18px)}}
+
+/* sheet */
+.sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:absolute;inset:0;background:rgba(10,24,6,.5)}
+.sheet{position:relative;width:100%;max-width:560px;max-height:92%;overflow-y:auto;background:var(--bg);border-radius:26px 26px 0 0;padding:8px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px;animation:up .22s ease-out}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 2px}
+.sheet h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:22px}
+.sheet-actions{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding-top:4px}
+.sheet-actions .grow{flex:1}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+
+/* show-driver overlay */
+.show{position:fixed;inset:0;z-index:30;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:calc(24px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px));text-align:center;border:0;width:100%}
+.show .big{font-family:var(--f-zh);font-weight:800;font-size:clamp(44px,14vw,96px);line-height:1.15;color:var(--ink);overflow-wrap:anywhere}
+.show .sub{font-size:20px;color:var(--lilac-deep);font-weight:700}
+.show .vi{font-size:15px;color:var(--ink-soft)}
+.show .hint{font-size:13px;color:var(--ink-soft);margin-top:20px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-weight:600;font-size:14px;max-width:calc(100% - 32px);text-align:center}
+.skel{height:92px;border-radius:20px;background:var(--surface-2)}
+.imp{display:flex;align-items:center;gap:12px;border:2px dashed var(--lilac);background:var(--lilac-soft);border-radius:18px;padding:12px 14px}
+.imp p{margin:0;flex:1;min-width:0;font-size:13px;font-weight:600;line-height:1.4}
+.imp p b{display:block;font-size:15px}
+#impText{min-height:180px}
+.show .sub.zh{font-family:var(--f-zh);font-size:clamp(22px,6.5vw,34px);line-height:1.3;color:var(--lilac-deep)}
+
+/* photo on stamp card */
+.pc-img{display:block;width:100%;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:var(--surface-2)}
+.pc-tags{display:flex;flex-wrap:wrap;gap:6px}
+.pc-tags span{font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--hero-ink);color:var(--hero-bg)}
+
+/* place detail page */
+.detail{position:fixed;inset:0;z-index:15;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+.d-top{position:sticky;top:0;z-index:2;background:var(--bg)}
+.d-top .wrap{display:flex;align-items:center;gap:10px;padding-block:10px}
+.d-top .grow{flex:1}
+.d-body{display:flex;flex-direction:column;gap:20px;padding-block:4px 20px}
+.gal{display:grid;gap:4px;border-radius:22px;overflow:hidden;max-width:100%}
+.gal.n1{grid-template-columns:1fr;aspect-ratio:16/10}
+.gal.n2{grid-template-columns:1fr 1fr;aspect-ratio:16/9}
+.gal.n3{grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;aspect-ratio:16/10}
+.gal.n3 button:first-child{grid-row:1 / 3}
+.gal button{border:0;padding:0;background:var(--surface-2);position:relative;min-height:0;overflow:hidden}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gal .more{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:13px;padding:2px 9px;border-radius:99px}
+.gal-empty{border:2px dashed var(--line);border-radius:22px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--ink-soft);font-size:14px;text-align:center}
+.d-head h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.15;text-wrap:balance}
+.d-head .zh{font-size:20px;font-weight:700;color:var(--lilac-deep);margin-top:4px}
+.d-head .py{font-size:14px;color:var(--ink-soft);font-style:italic}
+.d-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.d-tags span{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--surface-2);color:var(--grass-ink)}
+.d-tags span:nth-child(even){background:var(--lilac-soft);color:var(--lilac-deep)}
+.status{display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px 14px;font-size:14px;font-weight:600;background:var(--surface-2);color:var(--ink)}
+.status.st-check{background:var(--warn-bg);color:var(--warn-ink)}
+.status i{flex:none;width:10px;height:10px;border-radius:50%;background:currentColor;margin-top:6px}
+.d-sec{display:flex;flex-direction:column;gap:10px}
+.d-sec > .sec-h h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1.2}
+.prose{font-size:15px;line-height:1.6;display:flex;flex-direction:column;gap:8px;overflow-wrap:anywhere}
+.prose p{margin:0}
+.prose ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.tbl{overflow-x:auto;border:1.5px solid var(--line);border-radius:14px}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl th,.tbl td{text-align:left;padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+.tbl tr:first-child th{border-top:0;background:var(--surface-2);font-weight:700}
+.dish{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.dish:first-child{border-top:0;padding-top:0}
+.dish-th{width:76px;height:76px;border-radius:16px;overflow:hidden;border:0;padding:0;background:var(--pc-bg);color:var(--pc-zh);font-family:var(--f-zh);font-weight:900;font-size:30px;display:grid;place-items:center}
+.dish-th img{width:100%;height:100%;object-fit:cover;display:block}
+.dish-b{min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left;background:none;border:0;padding:0}
+.dish-b b{font-size:15px;line-height:1.35}
+.dish-b b .zh{color:var(--lilac-deep)}
+.dish-b span{font-size:14px;color:var(--ink-soft)}
+.try{align-self:flex-start;font-size:12px;font-weight:700;padding:1px 9px;border-radius:99px;background:var(--surface-2);color:var(--grass-ink);margin-top:3px}
+.addr .zh-big{font-family:var(--f-zh);font-size:21px;font-weight:700;line-height:1.35;user-select:all;overflow-wrap:anywhere}
+.addr .en{font-size:13px;color:var(--ink-soft)}
+.when .t{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}
+.when .lbl{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--surface-2);color:var(--grass-ink)}
+.src{font-size:12px;color:var(--ink-soft)}
+.lb{position:fixed;inset:0;z-index:35;background:#0B0F09;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.lb-img{flex:1;min-height:0;display:grid;place-items:center;padding:8px}
+.lb-img img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.lb-bar{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 16px;color:#fff}
+.lb-bar .btn.ghost{color:#fff;border-color:rgba(255,255,255,.4)}
+.lb-bar span{font-weight:700;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+html,body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
+.offline{display:flex;flex-direction:column;gap:8px}
+.offline .row{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.offline .dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--warn-ink)}
+.offline.ok .dot{background:var(--grass)}
+.offline .bar{margin-top:0}
+.offline .note{font-size:13px}
+.ck-row > button:first-child{padding-right:14px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1 id="pageTitle"><small>Thượng Hải · Hàng Châu</small><span>Tổng quan</span></h1>
+  </div>
+</header>
+
+<main><div class="wrap"><div class="view" id="view"><div class="skel"></div><div class="skel"></div></div></div></main>
+
+<nav class="nav" aria-label="Chuyển mục">
+  <div class="nav-in">
+    <button data-tab="home"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a2 2 0 0 1-2 2h-3v-6H9v6H6a2 2 0 0 1-2-2z"/></svg></i>Tổng quan</button>
+    <button data-tab="places"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i>Địa điểm</button>
+    <button data-tab="plan"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg></i>Lịch trình</button>
+    <button data-tab="info"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4z"/><path d="M14 5v14" stroke-dasharray="2 2.5"/></svg></i>Thông tin</button>
+  </div>
+</nav>
+
+<div class="detail" id="detail" hidden></div>
+<div class="lb" id="lb" hidden></div>
+<button class="show" id="show" hidden data-act="hideShow"></button>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const CITIES = { sh: "Thượng Hải", hz: "Hàng Châu" };
+const CITY_CODE = { sh: "310000", hz: "330100" };
+const CATS = { see: "Tham quan", eat: "Ăn uống", cafe: "Cà phê & trà", shop: "Mua sắm", photo: "Chụp ảnh", other: "Khác" };
+const BK = { flight: "Chuyến bay", hotel: "Khách sạn", train: "Tàu cao tốc", other: "Khác" };
+const STATUS = { idea: "Ý tưởng – chưa tìm hiểu", check: "Đã nghiên cứu – cần kiểm tra lại", ok: "Đã xác nhận" };
+const PHRASES = [
+  ["你好", "nǐ hǎo", "Xin chào"],
+  ["谢谢", "xièxie", "Cảm ơn"],
+  ["多少钱？", "duōshao qián", "Bao nhiêu tiền?"],
+  ["请带我去这个地址", "qǐng dài wǒ qù zhège dìzhǐ", "Cho tôi đến địa chỉ này"],
+  ["洗手间在哪里？", "xǐshǒujiān zài nǎlǐ", "Nhà vệ sinh ở đâu?"],
+  ["不要辣", "bú yào là", "Không cay"],
+  ["可以用支付宝吗？", "kěyǐ yòng zhīfùbǎo ma", "Trả bằng Alipay được không?"],
+  ["我不会说中文", "wǒ bú huì shuō zhōngwén", "Tôi không nói được tiếng Trung"],
+];
+const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const BK_ICON = {
+  flight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5L3 11l1.5-1.5 8 .5 4-4a2 2 0 0 1 3 3l-4 4 .5 8L14.5 22 12 14.5"/></svg>',
+  hotel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="2"/></svg>',
+  train: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="4"/><path d="M5 11h14M8 21l2-4M16 21l-2-4"/></svg>',
+  other: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>',
+};
+
+let D = null; // data.json
+const PL = {}; // places by id
+const ui = { tab: "home", city: "all", cat: "all", hideDone: false, day: null };
+const off = { total: 0, done: 0, running: false, error: false, sw: "serviceWorker" in navigator };
+
+/* ---------- local ticks (stored on this phone) ---------- */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem("sotay." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("sotay." + k, JSON.stringify(v)); } catch (e) {} },
+};
+Object.assign(ui, LS.get("ui", {}), { tab: "home", day: null });
+let doneMap = LS.get("done", {});
+let ckMap = LS.get("ck", {});
+const isDone = (id) => !!doneMap[id];
+const ckDone = (c) => (c.text in ckMap ? ckMap[c.text] : c.done);
+const saveUi = () => LS.set("ui", { city: ui.city, cat: ui.cat, hideDone: ui.hideDone });
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtNum = (n) => Number(n || 0).toLocaleString("vi-VN");
+const clip = (s, n) => (s.length > n ? s.slice(0, n).trim() + "…" : s);
+const places = () => (D ? D.places : []);
+const safeUrl = (u) => (/^https?:\/\//i.test(u) ? u : "https://" + u);
+const mapUrl = (p) => `https://uri.amap.com/search?keyword=${encodeURIComponent(p.addrZh || p.zh || p.name)}${p.city ? "&city=" + CITY_CODE[p.city] : ""}`;
+
+/* ---------- dates ---------- */
+const parseD = (s) => { if (!s) return null; const [y, m, d] = s.split("-").map(Number); return y ? new Date(y, m - 1, d) : null; };
+const today0 = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
+const DOW = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+const ddmm = (d) => `${d.getDate()}/${d.getMonth() + 1}`;
+const planItems = () => (D ? D.plan.items : []);
+function numDays() {
+  const a = parseD(D.plan.start), b = parseD(D.plan.end);
+  if (a && b && b >= a) return Math.min(30, Math.round((b - a) / 864e5) + 1);
+  return Math.max(1, ...planItems().map((p) => p.day));
+}
+function dayDate(i) { const a = parseD(D.plan.start); if (!a) return null; const d = new Date(a); d.setDate(d.getDate() + i - 1); return d; }
+function currentDay() { const a = parseD(D.plan.start); if (!a) return null; const i = Math.round((today0() - a) / 864e5) + 1; return i >= 1 && i <= numDays() ? i : null; }
+function dayCity(i) { return [...new Set(planItems().filter((p) => p.day === i).map((p) => p.city).filter(Boolean))].map((c) => CITIES[c]).join(" → "); }
+const byTime = (a, b) => (a.time || "99").localeCompare(b.time || "99");
+
+/* ---------- render ---------- */
+const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", info: "Thông tin chuyến đi" };
+function render() {
+  document.querySelectorAll(".nav button").forEach((b) => { if (b.dataset.tab === ui.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  $("#pageTitle span").textContent = TITLES[ui.tab];
+  if (!D) return;
+  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, info: viewInfo })[ui.tab]();
+  renderDetail();
+}
+
+function offlineCard() {
+  if (!off.sw) return `<div class="card offline"><div class="row"><span class="dot"></span>Trình duyệt này không hỗ trợ lưu offline. Hãy mở bằng Safari rồi Thêm vào Màn hình chính.</div></div>`;
+  const ok = off.total > 0 && off.done >= off.total && !off.running;
+  const pct = off.total ? Math.round((off.done / off.total) * 100) : 100;
+  const msg = off.total === 0 ? "Sẵn sàng dùng offline." : ok ? `Đã lưu đủ ${off.total} ảnh. Dùng được khi không có mạng.`
+    : off.error ? `Đã lưu ${off.done}/${off.total} ảnh. Một số ảnh chưa lưu được, mở lại app khi có wifi.`
+    : `Đang lưu ảnh để dùng offline: ${off.done}/${off.total}. Giữ app mở khi có wifi.`;
+  return `<div class="card offline ${ok || off.total === 0 ? "ok" : ""}"><div class="row"><span class="dot"></span><span>${msg}</span></div>${off.total && !ok ? `<div class="bar"><i style="width:${pct}%"></i></div>` : ""}<span class="note">Cập nhật lúc ${esc(D.builtAt || "")}</span></div>`;
+}
+
+function viewHome() {
+  const a = parseD(D.plan.start), b = parseD(D.plan.end);
+  let count = "";
+  if (a) {
+    const diff = Math.round((a - today0()) / 864e5), cd = currentDay();
+    if (diff > 0) count = `<div class="count"><b>${diff}</b><span>ngày nữa<br>là lên đường</span></div>`;
+    else if (cd) count = `<div class="count"><b>${cd}/${numDays()}</b><span>Hôm nay là ngày ${cd}<br>${esc(dayCity(cd))}</span></div>`;
+    else count = `<div class="count"><span>Chuyến đi đã kết thúc. Hy vọng bạn đã có nhiều kỷ niệm đẹp.</span></div>`;
+  }
+  const dates = a ? `${DOW[a.getDay()]} ${ddmm(a)}${b ? " – " + DOW[b.getDay()] + " " + ddmm(b) + "/" + b.getFullYear() : ""} · ${numDays()} ngày` : "Chưa ghi ngày đi trong lich-trinh.md";
+  const hero = `<section class="hero stamp"><div class="hero-zh">上海<i>·</i>杭州</div><div class="hero-title">${esc(D.info.name || "Thượng Hải & Hàng Châu")}</div><div class="hero-dates">${dates}</div>${count}</section>`;
+  const pl = places(), done = pl.filter((p) => isDone(p.id)).length;
+  const ck = D.info.checklist, ckd = ck.filter(ckDone).length;
+  const stats = `<div class="stats">
+    <button class="stat" data-tab="places"><b>${pl.length}</b><span>Địa điểm · ${done} đã đi</span></button>
+    <button class="stat" data-tab="plan"><b>${planItems().length}</b><span>Hoạt động trong ${numDays()} ngày</span></button>
+    <button class="stat" data-tab="info"><b>${ckd}/${ck.length}</b><span>Đã chuẩn bị</span><div class="bar"><i style="width:${ck.length ? Math.round((ckd / ck.length) * 100) : 0}%"></i></div></button>
+  </div>`;
+  const d = currentDay() || 1, dd = dayDate(d);
+  const items = planItems().filter((p) => p.day === d).sort(byTime);
+  const next = `<section class="sec"><div class="sec-h"><h2>${currentDay() ? "Hôm nay" : "Ngày đầu tiên"}${dd ? ` · ${DOW[dd.getDay()]} ${ddmm(dd)}` : ""}</h2><button class="link" data-act="goDay" data-day="${d}">Xem cả ngày</button></div>
+    ${items.length ? `<div class="tl">${items.map(tlItem).join("")}</div>` : '<div class="empty"><span>Chưa có hoạt động cho ngày này.</span></div>'}</section>`;
+  const must = pl.filter((p) => p.must && !isDone(p.id)).slice(0, 4);
+  const mustSec = must.length ? `<section class="sec"><div class="sec-h"><h2>Nhất định phải đi</h2><button class="link" data-tab="places">Xem hết</button></div><div class="list">${must.map(placeCard).join("")}</div></section>` : "";
+  return hero + offlineCard() + stats + next + mustSec;
+}
+
+function placeCard(p) {
+  const done = isDone(p.id);
+  return `<article class="pcard stamp ${p.city === "hz" ? "alt" : ""} ${done ? "done" : ""}">
+    <div class="card-top">
+      <button class="card-main" data-act="openPlace" data-id="${p.id}" style="color:inherit">
+        ${p.zh ? `<div class="pc-zh">${esc(p.zh)}</div>` : ""}
+        <h3 class="pc-name">${esc(p.name)}</h3>
+      </button>
+      ${done ? '<span class="pm">ĐÃ GHÉ</span>' : ""}
+      <button class="check" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}" aria-label="Đánh dấu đã đi">${ICON_CHECK}</button>
+    </div>
+    <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
+    ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
+    ${p.photos.length ? `<button class="card-main" data-act="openPlace" data-id="${p.id}" aria-label="Xem ${esc(p.name)}"><img class="pc-img" src="${p.photos[0]}" alt="" loading="lazy"></button>` : ""}
+    ${p.note ? `<p class="note">${esc(clip(p.note.split("\n")[0], 140))}</p>` : ""}
+    <div class="actions">
+      <button class="btn small lilac" data-act="openPlace" data-id="${p.id}">Xem chi tiết</button>
+      ${p.zh || p.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}
+    </div>
+  </article>`;
+}
+
+function viewPlaces() {
+  const all = places();
+  const ps = all.filter((p) => (ui.city === "all" || p.city === ui.city) && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
+    .sort((a, b) => (isDone(a.id) ? 1 : 0) - (isDone(b.id) ? 1 : 0) || (b.must ? 1 : 0) - (a.must ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0));
+  const cnt = (c) => all.filter((p) => c === "all" || p.city === c).length;
+  const seg = `<div class="seg" role="group" aria-label="Thành phố">${["all", "sh", "hz"].map((c) => `<button data-act="city" data-v="${c}" aria-pressed="${ui.city === c}">${c === "all" ? "Tất cả" : CITIES[c]} ${cnt(c)}</button>`).join("")}</div>`;
+  const chips = `<div class="chips" role="group" aria-label="Loại">${[["all", "Mọi loại"], ...Object.entries(CATS)].map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}</button>`).join("")}</div>`;
+  const tog = `<div class="toggle-row"><span>${ps.length} địa điểm</span><button class="switch" data-act="hideDone" aria-pressed="${ui.hideDone}"><i></i>Ẩn chỗ đã đi</button></div>`;
+  const body = ps.length ? `<div class="list">${ps.map(placeCard).join("")}</div>` : '<div class="empty"><b>Không có địa điểm nào khớp bộ lọc</b><span>Thử chọn "Tất cả" hoặc "Mọi loại".</span></div>';
+  return seg + chips + tog + body;
+}
+
+function tlItem(p) {
+  const place = p.place && PL[p.place];
+  const cd = currentDay();
+  return `<div class="tl-item ${cd && p.day < cd ? "past" : ""}">
+    <div class="tl-time">${esc(p.time || "–")}</div>
+    <div class="tl-rail"><i></i></div>
+    <div class="tl-card card">
+      <div class="card-main"><h3>${esc(p.title)}</h3>${place && place.zh ? `<div class="zh">${esc(place.zh)}</div>` : ""}</div>
+      ${p.city || p.move ? `<div class="meta">${p.city ? `<span class="tag city-${p.city}">${CITIES[p.city]}</span>` : ""}${p.move ? `<span>${esc(p.move)}</span>` : ""}</div>` : ""}
+      ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
+      ${place ? `<div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${place.id}">Chi tiết</button>${place.zh || place.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${place.id}">Đưa tài xế xem</button>` : ""}</div>` : ""}
+    </div>
+  </div>`;
+}
+
+function viewPlan() {
+  const n = numDays();
+  if (!ui.day || ui.day > n) ui.day = currentDay() || 1;
+  const days = `<div class="days" role="group" aria-label="Chọn ngày">${Array.from({ length: n }, (_, k) => {
+    const i = k + 1, d = dayDate(i), c = planItems().filter((p) => p.day === i).length;
+    return `<button class="day" data-act="day" data-v="${i}" aria-pressed="${ui.day === i}"><span>Ngày</span><b>${i}</b><span>${d ? DOW[d.getDay()] + " " + ddmm(d) : "&nbsp;"}</span><em>${c} mục</em></button>`;
+  }).join("")}</div>`;
+  const d = dayDate(ui.day), items = planItems().filter((p) => p.day === ui.day).sort(byTime);
+  const head = `<div class="day-head"><div><h2>Ngày ${ui.day}${d ? ` · ${DOW[d.getDay()]} ${ddmm(d)}` : ""}</h2><p>${esc(dayCity(ui.day) || "Chưa có điểm đến")}</p></div></div>`;
+  const body = items.length ? `<div class="tl">${items.map(tlItem).join("")}</div>` : '<div class="empty"><span>Ngày này còn trống.</span></div>';
+  return days + head + body;
+}
+
+function bkCard(b) {
+  const dt = parseD(b.date);
+  return `<article class="card bk"><div class="bk-ico">${BK_ICON[b.kind] || BK_ICON.other}</div>
+    <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+      <div class="meta"><span>${BK[b.kind] || "Khác"}</span>${dt ? `<span>· ${DOW[dt.getDay()]} ${ddmm(dt)}</span>` : ""}${b.time ? `<span>· ${esc(b.time)}</span>` : ""}</div>
+      <h3 style="margin:0;font-size:16px">${esc(b.title)}</h3>
+      ${b.addrZh ? `<div class="zh" style="font-size:17px;font-weight:700">${esc(b.addrZh)}</div><div class="actions"><button class="btn small" data-act="copy" data-v="${esc(b.addrZh)}">Sao chép địa chỉ</button><button class="btn small lilac" data-act="showText" data-v="${esc(b.addrZh)}" data-sub="${esc(b.title)}">Đưa tài xế xem</button></div>` : ""}
+      ${b.detail ? prose(b.detail) : ""}
+    </div></article>`;
+}
+
+function viewInfo() {
+  const I = D.info;
+  const bk = `<section class="sec"><div class="sec-h"><h2>Khách sạn & vé</h2></div>${I.bookings.length ? `<div class="list">${I.bookings.map(bkCard).join("")}</div>` : '<div class="empty"><span>Chưa có. Thêm trong thong-tin.md.</span></div>'}</section>`;
+  const ck = I.checklist, ckd = ck.filter(ckDone).length;
+  const cks = `<section class="sec"><div class="sec-h"><h2>Chuẩn bị trước khi đi</h2><span class="tag">${ckd}/${ck.length}</span></div>
+    <div class="ck">${ck.map((c, i) => `<div class="ck-row ${ckDone(c) ? "on" : ""}"><button data-act="toggleCk" data-i="${i}" aria-pressed="${ckDone(c)}"><span class="box">${ICON_CHECK}</span><span class="txt">${esc(c.text)}</span></button></div>`).join("")}</div></section>`;
+  const notes = I.notes ? `<section class="sec"><div class="sec-h"><h2>Ghi chú</h2></div><div class="card">${prose(I.notes)}</div></section>` : "";
+  const ph = `<section class="sec"><div class="sec-h"><h2>Câu tiếng Trung hay dùng</h2></div><p class="note" style="margin-top:-6px">Chạm để phóng to cho người bán hàng hoặc tài xế xem.</p>
+    <div class="phrases">${PHRASES.map((p, i) => `<button class="phrase" data-act="showPhrase" data-i="${i}"><span class="zh">${p[0]}</span><small>${p[1]}</small><span>${p[2]}</span></button>`).join("")}</div></section>`;
+  const sos = `<section class="sec"><div class="sec-h"><h2>Số khẩn cấp ở Trung Quốc</h2></div><div class="sos"><div><b>110</b><span>Cảnh sát</span></div><div><b>120</b><span>Cấp cứu</span></div><div><b>119</b><span>Cứu hoả</span></div></div></section>`;
+  const rate = `<section class="sec"><div class="sec-h"><h2>Tỷ giá</h2></div><div class="card"><div class="money"><b>¥100</b><span>≈ ${fmtNum(Math.round(100 * (I.rate || 3650)))} ₫</span></div><span class="meta">1 ¥ = ${fmtNum(I.rate || 3650)} ₫</span></div></section>`;
+  return `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>` + bk + cks + notes + ph + rate + sos;
+}
+
+/* ---------- detail ---------- */
+let detailId = null, lb = null;
+function prose(text) {
+  let html = "", ul = [], tbl = [];
+  const flush = () => {
+    if (ul.length) { html += `<ul>${ul.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>`; ul = []; }
+    if (tbl.length) { html += `<div class="tbl"><table>${tbl.map((r, i) => `<tr>${r.map((c) => (i === 0 ? `<th>${esc(c)}</th>` : `<td>${esc(c)}</td>`)).join("")}</tr>`).join("")}</table></div>`; tbl = []; }
+  };
+  for (const raw of String(text || "").split(/\r?\n/)) {
+    const l = raw.trim();
+    if (!l) { flush(); continue; }
+    if (/^\|?\s*:?-{2,}/.test(l)) continue;
+    if (l.includes("|")) { if (ul.length) flush(); tbl.push(l.replace(/^\||\|$/g, "").split("|").map((s) => s.trim())); continue; }
+    if (/^[-•*]\s+/.test(l)) { if (tbl.length) flush(); ul.push(l.replace(/^[-•*]\s+/, "")); continue; }
+    flush(); html += `<p>${esc(l)}</p>`;
+  }
+  flush();
+  return `<div class="prose">${html}</div>`;
+}
+function renderDetail() {
+  const box = $("#detail"), p = detailId && PL[detailId];
+  if (!p) { if (!box.hidden) { box.hidden = true; document.body.style.overflow = ""; } return; }
+  const wasHidden = box.hidden, sc = box.scrollTop, ph = p.photos, done = isDone(p.id);
+  let gal = "";
+  if (ph.length) { const shown = ph.slice(0, 3), n = shown.length;
+    gal = `<div class="gal n${n}">${shown.map((u, i) => `<button data-act="lbOpen" data-i="${i}" aria-label="Xem ảnh ${i + 1}"><img src="${u}" alt="" loading="lazy">${i === n - 1 && ph.length > 3 ? `<span class="more">+${ph.length - 3}</span>` : ""}</button>`).join("")}</div>`; }
+  const tags = [p.city && CITIES[p.city], CATS[p.cat], ...p.tags, p.must && "Phải đi"].filter(Boolean);
+  const head = `<div class="d-head"><h2>${esc(p.name)}</h2>${p.zh ? `<div class="zh">${esc(p.zh)}${p.py ? ` <span class="py">${esc(p.py)}</span>` : ""}</div>` : ""}<div class="d-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div></div>`;
+  const status = STATUS[p.status] ? `<div class="status st-${p.status}"><i></i><span>${STATUS[p.status]}</span></div>` : "";
+  const intro = p.note ? prose(p.note) : "";
+  const dishSec = p.dishes.length ? `<section class="d-sec"><div class="sec-h"><h3>Món đáng thử</h3></div><div>${p.dishes.map((d, i) => `<div class="dish"><button class="dish-th" data-act="dishPhoto" data-i="${i}" aria-label="Ảnh món ${esc(d.vi || d.zh)}">${d.photo ? `<img src="${d.photo}" alt="" loading="lazy">` : esc((d.zh || d.vi || "?").slice(0, 1))}</button><button class="dish-b" data-act="showDish" data-i="${i}"><b>${d.zh ? `<span class="zh">${esc(d.zh)}</span> ` : ""}${d.py ? `(${esc(d.py)}) ` : ""}${d.vi ? `– ${esc(d.vi)}` : ""}</b>${d.desc ? `<span>${esc(d.desc)}</span>` : ""}${d.must ? '<span class="try">Nên thử</span>' : ""}</button></div>`).join("")}</div></section>` : "";
+  const addr = `<section class="d-sec"><div class="sec-h"><h3>Địa chỉ và cách đi</h3></div><div class="card addr">
+    ${p.addrZh ? `<div class="zh-big">${esc(p.addrZh)}</div>` : ""}
+    ${p.addrVi ? `<div class="en">${esc(p.addrVi)}</div>` : !p.addrZh ? `<div class="en">${esc(p.area || "Chưa có địa chỉ.")}</div>` : ""}
+    <div class="actions">${p.addrZh ? `<button class="btn small" data-act="copy" data-v="${esc(p.addrZh)}">Sao chép địa chỉ</button>` : ""}${p.zh || p.addrZh ? `<button class="btn small lilac" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}<a class="btn small ghost" href="${mapUrl(p)}" target="_blank" rel="noopener">Mở Amap</a></div></div></section>`;
+  const when = p.bestTime || p.bestNote ? `<section class="d-sec"><div class="sec-h"><h3>Nên đi lúc nào?</h3></div><div class="card when"><span class="lbl">Khung giờ nên đến</span>${p.bestTime ? `<div class="t">${esc(p.bestTime)}</div>` : ""}${p.bestNote ? prose(p.bestNote) : ""}</div></section>` : "";
+  const secs = p.sections.map((s) => `<section class="d-sec"><div class="sec-h"><h3>${esc(s.title)}</h3></div>${prose(s.body)}</section>`).join("");
+  const foot = p.link || p.sources ? `<div class="d-sec">${p.link ? `<div class="actions"><a class="btn small ghost" href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener">Mở link tham khảo</a></div>` : ""}${p.sources ? `<p class="src">Nguồn: ${esc(p.sources)}</p>` : ""}</div>` : "";
+  box.innerHTML = `<div class="d-top"><div class="wrap">
+      <button class="icon-btn" data-act="closeDetail" aria-label="Quay lại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <span class="grow"></span>
+      <button class="btn small ${done ? "" : "ghost"}" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}">${done ? "✓ Đã ghé" : "Đánh dấu đã ghé"}</button>
+    </div></div>
+    <div class="wrap"><div class="d-body">${gal}${head}${status}${intro}${dishSec}${addr}${when}${secs}${foot}</div></div>`;
+  if (wasHidden) { box.hidden = false; box.scrollTop = 0; document.body.style.overflow = "hidden"; } else box.scrollTop = sc;
+}
+let detailPushed = false;
+function openPlace(id) {
+  detailId = id; renderDetail();
+  if (location.hash !== "#place-" + id) { detailPushed = true; location.hash = "place-" + id; }
+}
+function closeDetail() {
+  const id = detailId;
+  if (detailPushed) { detailPushed = false; history.back(); setTimeout(() => { if (detailId === id) { detailId = null; renderDetail(); } }, 400); }
+  else { try { history.replaceState(null, "", "#" + ui.tab); } catch (e) {} detailId = null; renderDetail(); }
+}
+function drawLb() {
+  const el = $("#lb");
+  if (!lb || !lb.ids.length) { el.hidden = true; lb = null; return; }
+  const n = lb.ids.length; lb.i = (lb.i + n) % n;
+  el.innerHTML = `<div class="lb-bar"><button class="btn small ghost" data-act="lbClose">Đóng</button><span>${n > 1 ? `${lb.i + 1}/${n}` : ""}</span><span></span></div>
+    <div class="lb-img" data-act="lbNext"><img src="${lb.ids[lb.i]}" alt=""></div>
+    ${n > 1 ? '<div class="lb-bar"><button class="btn ghost" data-act="lbPrev">‹ Trước</button><button class="btn ghost" data-act="lbNext">Sau ›</button></div>' : ""}`;
+  el.hidden = false;
+}
+
+/* ---------- overlays ---------- */
+function show(big, sub, vi, subZh) {
+  $("#show").innerHTML = `<div class="big">${esc(big)}</div>${sub ? `<div class="sub ${subZh ? "zh" : ""}">${esc(sub)}</div>` : ""}${vi ? `<div class="vi">${esc(vi)}</div>` : ""}<div class="hint">Chạm để đóng</div>`;
+  $("#show").hidden = false;
+}
+let toastT;
+function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2400); }
+
+/* ---------- events ---------- */
+function setTab(t) { ui.tab = t; try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo(0, 0); }
+document.addEventListener("click", (e) => {
+  const tabEl = e.target.closest("[data-tab]");
+  if (tabEl) { setTab(tabEl.dataset.tab); return; }
+  const el = e.target.closest("[data-act]"); if (!el) return;
+  const a = el.dataset.act, id = el.dataset.id;
+  switch (a) {
+    case "city": ui.city = el.dataset.v; saveUi(); render(); break;
+    case "cat": ui.cat = el.dataset.v; saveUi(); render(); break;
+    case "hideDone": ui.hideDone = !ui.hideDone; saveUi(); render(); break;
+    case "togglePlace": { const p = PL[id]; if (!p) break; doneMap = { ...doneMap, [id]: !isDone(id) }; LS.set("done", doneMap); render(); if (isDone(id)) toast("Đã ghé: " + p.name); break; }
+    case "openPlace": openPlace(id); break;
+    case "closeDetail": closeDetail(); break;
+    case "showPlace": { const p = PL[id]; if (p) show(p.zh || p.name, p.addrZh || p.area, p.name, !!p.addrZh); break; }
+    case "showText": show(el.dataset.v, "", el.dataset.sub); break;
+    case "showPhrase": { const p = PHRASES[+el.dataset.i]; show(p[0], p[1], p[2]); break; }
+    case "showDish": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.zh) show(d.zh, d.py, d.vi); break; }
+    case "hideShow": $("#show").hidden = true; break;
+    case "lbOpen": { const p = PL[detailId]; if (p) { lb = { ids: p.photos, i: +el.dataset.i }; drawLb(); } break; }
+    case "dishPhoto": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.photo) { lb = { ids: [d.photo], i: 0 }; drawLb(); } break; }
+    case "lbClose": lb = null; drawLb(); break;
+    case "lbPrev": lb.i--; drawLb(); break;
+    case "lbNext": if (lb && lb.ids.length > 1) { lb.i++; drawLb(); } break;
+    case "day": ui.day = +el.dataset.v; render(); break;
+    case "goDay": ui.day = +el.dataset.day; setTab("plan"); break;
+    case "toggleCk": { const c = D.info.checklist[+el.dataset.i]; if (c) { ckMap = { ...ckMap, [c.text]: !ckDone(c) }; LS.set("ck", ckMap); render(); } break; }
+    case "copy": {
+      const v = el.dataset.v;
+      try { navigator.clipboard.writeText(v).then(() => toast("Đã sao chép"), () => toast("Không sao chép được. Hãy nhấn giữ để chọn.")); }
+      catch (err) { toast("Không sao chép được. Hãy nhấn giữ để chọn."); }
+      break;
+    }
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (lb) { lb = null; drawLb(); } else if (!$("#show").hidden) $("#show").hidden = true; else if (detailId) closeDetail();
+});
+function fromHash() {
+  const h = location.hash.slice(1);
+  if (h.startsWith("place-")) { detailId = h.slice(6); renderDetail(); return; }
+  detailId = null; detailPushed = false; lb = null; drawLb();
+  if (TITLES[h]) ui.tab = h;
+  render();
+}
+window.addEventListener("hashchange", fromHash);
+
+/* ---------- offline: cache every image ---------- */
+async function cacheImages() {
+  if (!off.sw || !("caches" in window) || off.running) return;
+  off.running = true; off.error = false;
+  const list = D.images || [];
+  off.total = list.length; off.done = 0;
+  try {
+    const c = await caches.open("anh-v1");
+    const have = new Set((await c.keys()).map((r) => new URL(r.url).pathname));
+    const base = new URL(".", location.href);
+    const need = [];
+    for (const rel of list) { const u = new URL(rel, base); if (have.has(u.pathname)) off.done++; else need.push(u.href); }
+    // drop images that are no longer in the notebook
+    const keep = new Set(list.map((rel) => new URL(rel, base).pathname));
+    for (const r of await c.keys()) if (!keep.has(new URL(r.url).pathname)) c.delete(r);
+    render();
+    let last = 0;
+    const worker = async () => {
+      while (need.length) {
+        const u = need.shift();
+        try { const res = await fetch(u, { cache: "no-cache" }); if (res.ok) { await c.put(u, res); off.done++; } else off.error = true; }
+        catch (e) { off.error = true; }
+        if (Date.now() - last > 400) { last = Date.now(); if (ui.tab === "home" || ui.tab === "info") render(); }
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+  } catch (e) { off.error = true; }
+  off.running = false;
+  if (ui.tab === "home" || ui.tab === "info") render();
+}
+
+/* ---------- boot ---------- */
+const h0 = location.hash.slice(1);
+if (TITLES[h0]) ui.tab = h0;
+render();
+fetch("data.json").then((r) => r.json()).then((data) => {
+  D = data;
+  D.places.forEach((p) => (PL[p.id] = p));
+  if (h0.startsWith("place-") && PL[h0.slice(6)]) { ui.tab = "places"; detailId = h0.slice(6); }
+  render();
+  if (off.sw) {
+    let reloading = false;
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !reloading) { reloading = true; location.reload(); } });
+    navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(cacheImages).catch(() => { off.sw = false; render(); });
+  }
+}).catch(() => {
+  $("#view").innerHTML = '<div class="empty"><b>Chưa tải được dữ liệu</b><span>Mở app một lần khi có mạng để lưu bản offline.</span></div>';
+});
+})();
+</script>
+</body>
+</html>

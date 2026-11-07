@@ -1,0 +1,14 @@
+{
+  "name": "Sổ tay Thượng Hải Hàng Châu",
+  "short_name": "Sổ tay TQ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F2FAE8",
+  "theme_color": "#F2FAE8",
+  "lang": "vi",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
