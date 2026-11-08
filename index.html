@@ -310,9 +310,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .prose{font-size:15px;line-height:1.6;display:flex;flex-direction:column;gap:8px;overflow-wrap:anywhere}
 .prose p{margin:0}
 .prose ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
-.tbl{overflow-x:auto;border:1.5px solid var(--line);border-radius:14px}
-.tbl table{border-collapse:collapse;width:100%;font-size:14px}
-.tbl th,.tbl td{text-align:left;padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+.tbl{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;border:1.5px solid var(--line);border-radius:14px;
+  background:linear-gradient(to right,var(--bg) 40%,transparent) left/28px 100% no-repeat local,linear-gradient(to left,var(--bg) 40%,transparent) right/28px 100% no-repeat local,
+  radial-gradient(farthest-side at 0 50%,rgba(0,0,0,.2),transparent) left/12px 100% no-repeat scroll,radial-gradient(farthest-side at 100% 50%,rgba(0,0,0,.2),transparent) right/12px 100% no-repeat scroll;
+  background-color:var(--bg)}
+.tbl table{border-collapse:collapse;width:max-content;min-width:100%;font-size:14px;line-height:1.45}
+.tbl th,.tbl td{text-align:left;padding:9px 12px;border-top:1px solid var(--line);vertical-align:top;overflow-wrap:normal;word-break:normal;min-width:5.5em;max-width:14em}
+.tbl th:first-child,.tbl td:first-child{min-width:4.5em;max-width:9em;font-weight:600}
+.tbl tr:first-child th{white-space:nowrap}
 .tbl tr:first-child th{border-top:0;background:var(--surface-2);font-weight:700}
 .dish{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
 .dish:first-child{border-top:0;padding-top:0}
