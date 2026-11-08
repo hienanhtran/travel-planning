@@ -159,6 +159,7 @@ main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 .tag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;background:var(--surface-2);color:var(--ink);font-size:12px;font-weight:600}
 .tag.city-sh{background:var(--lime);color:var(--on-lime)}
 .tag.city-hz{background:var(--lilac);color:#1E0F38}
+.tag.city-both{background:linear-gradient(90deg,var(--lime) 50%,var(--lilac) 50%);color:#1E0F38}
 .tag.must{background:transparent;border:1.5px solid var(--lilac-deep);color:var(--lilac-deep)}
 .tag.sample{background:transparent;border:1.5px dashed var(--line);color:var(--ink-soft)}
 .note{font-size:14px;color:var(--ink-soft);margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -373,7 +374,7 @@ img{max-width:100%}
 
 <script>
 (() => {
-const CITIES = { sh: "Thượng Hải", hz: "Hàng Châu" };
+const CITIES = { sh: "Thượng Hải", hz: "Hàng Châu", both: "Thượng Hải & Hàng Châu" };
 const CITY_CODE = { sh: "310000", hz: "330100" };
 const CATS = { see: "Tham quan", eat: "Ăn uống", cafe: "Cà phê & trà", shop: "Mua sắm", photo: "Chụp ảnh", other: "Khác" };
 const BK = { flight: "Chuyến bay", hotel: "Khách sạn", train: "Tàu cao tốc", other: "Khác" };
@@ -419,7 +420,7 @@ const fmtNum = (n) => Number(n || 0).toLocaleString("vi-VN");
 const clip = (s, n) => (s.length > n ? s.slice(0, n).trim() + "…" : s);
 const places = () => (D ? D.places : []);
 const safeUrl = (u) => (/^https?:\/\//i.test(u) ? u : "https://" + u);
-const mapUrl = (p) => `https://uri.amap.com/search?keyword=${encodeURIComponent(p.addrZh || p.zh || p.name)}${p.city ? "&city=" + CITY_CODE[p.city] : ""}`;
+const mapUrl = (p) => `https://uri.amap.com/search?keyword=${encodeURIComponent(p.addrZh || p.zh || p.name)}${CITY_CODE[p.city] ? "&city=" + CITY_CODE[p.city] : ""}`;
 
 /* ---------- dates ---------- */
 const parseD = (s) => { if (!s) return null; const [y, m, d] = s.split("-").map(Number); return y ? new Date(y, m - 1, d) : null; };
@@ -508,9 +509,9 @@ function placeCard(p) {
 
 function viewPlaces() {
   const all = places();
-  const ps = all.filter((p) => (ui.city === "all" || p.city === ui.city) && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
+  const ps = all.filter((p) => (ui.city === "all" || p.city === ui.city || p.city === "both") && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
     .sort((a, b) => (isDone(a.id) ? 1 : 0) - (isDone(b.id) ? 1 : 0) || (b.must ? 1 : 0) - (a.must ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0));
-  const cnt = (c) => all.filter((p) => c === "all" || p.city === c).length;
+  const cnt = (c) => all.filter((p) => c === "all" || p.city === c || p.city === "both").length;
   const seg = `<div class="seg" role="group" aria-label="Thành phố">${["all", "sh", "hz"].map((c) => `<button data-act="city" data-v="${c}" aria-pressed="${ui.city === c}">${c === "all" ? "Tất cả" : CITIES[c]} ${cnt(c)}</button>`).join("")}</div>`;
   const chips = `<div class="chips" role="group" aria-label="Loại">${[["all", "Mọi loại"], ...Object.entries(CATS)].map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}</button>`).join("")}</div>`;
   const tog = `<div class="toggle-row"><span>${ps.length} địa điểm</span><button class="switch" data-act="hideDone" aria-pressed="${ui.hideDone}"><i></i>Ẩn chỗ đã đi</button></div>`;
