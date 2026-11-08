@@ -523,6 +523,7 @@ function placeCard(p) {
     <div class="actions">
       <button class="btn small lilac" data-act="openPlace" data-id="${p.id}">Xem chi tiết</button>
       ${p.zh || p.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}
+      <button class="btn small ghost" data-act="amap" data-id="${p.id}">Mở Amap</button>
     </div>
   </article>`;
 }
@@ -549,7 +550,7 @@ function tlItem(p) {
       <div class="card-main"><h3>${esc(p.title)}</h3>${place && place.zh ? `<div class="zh">${esc(place.zh)}</div>` : ""}</div>
       ${p.city || p.move ? `<div class="meta">${p.city ? `<span class="tag city-${p.city}">${CITIES[p.city]}</span>` : ""}${p.move ? `<span>${esc(p.move)}</span>` : ""}</div>` : ""}
       ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
-      ${place ? `<div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${place.id}">Chi tiết</button>${place.zh || place.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${place.id}">Đưa tài xế xem</button>` : ""}</div>` : ""}
+      ${place ? `<div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${place.id}">Chi tiết</button>${place.zh || place.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${place.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${place.id}">Mở Amap</button></div>` : ""}
     </div>
   </div>`;
 }
