@@ -425,6 +425,21 @@ const fmtNum = (n) => Number(n || 0).toLocaleString("vi-VN");
 const clip = (s, n) => (s.length > n ? s.slice(0, n).trim() + "…" : s);
 const places = () => (D ? D.places : []);
 const safeUrl = (u) => (/^https?:\/\//i.test(u) ? u : "https://" + u);
+const CITY_ZH = { sh: "上海", hz: "杭州" };
+// Search keyword for map apps: Chinese name with the city in front (best POI match), else the Chinese address
+const mapQuery = (p) => (p.zh ? `${CITY_ZH[p.city] ? CITY_ZH[p.city] + " " : ""}${p.zh}` : p.addrZh || p.name);
+const amapAppUrl = (p) => `iosamap://poi?sourceApplication=sotay&name=${encodeURIComponent(mapQuery(p))}&dev=0`;
+const appleMapUrl = (p) => `maps://?q=${encodeURIComponent(p.addrZh || mapQuery(p))}`;
+function openAmap(p) {
+  let left = false;
+  const onHide = () => { if (document.hidden) left = true; };
+  document.addEventListener("visibilitychange", onHide);
+  location.href = amapAppUrl(p);
+  setTimeout(() => {
+    document.removeEventListener("visibilitychange", onHide);
+    if (!left && !document.hidden) toast("Không mở được Amap. Hãy cài app Amap (高德地图), hoặc dùng nút Bản đồ Apple.");
+  }, 1800);
+}
 const mapUrl = (p) => `https://uri.amap.com/search?keyword=${encodeURIComponent(p.addrZh || p.zh || p.name)}${CITY_CODE[p.city] ? "&city=" + CITY_CODE[p.city] : ""}`;
 
 /* ---------- dates ---------- */
@@ -611,7 +626,7 @@ function renderDetail() {
   const addr = `<section class="d-sec"><div class="sec-h"><h3>Địa chỉ và cách đi</h3></div><div class="card addr">
     ${p.addrZh ? `<div class="zh-big">${esc(p.addrZh)}</div>` : ""}
     ${p.addrVi ? `<div class="en">${esc(p.addrVi)}</div>` : !p.addrZh ? `<div class="en">${esc(p.area || "Chưa có địa chỉ.")}</div>` : ""}
-    <div class="actions">${p.addrZh ? `<button class="btn small" data-act="copy" data-v="${esc(p.addrZh)}">Sao chép địa chỉ</button>` : ""}${p.zh || p.addrZh ? `<button class="btn small lilac" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}<a class="btn small ghost" href="${mapUrl(p)}" target="_blank" rel="noopener">Mở Amap</a></div></div></section>`;
+    <div class="actions">${p.addrZh ? `<button class="btn small" data-act="copy" data-v="${esc(p.addrZh)}">Sao chép địa chỉ</button>` : ""}${p.zh || p.addrZh ? `<button class="btn small lilac" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${p.id}">Mở app Amap</button><a class="btn small ghost" href="${appleMapUrl(p)}">Bản đồ Apple</a></div></div></section>`;
   const when = p.bestTime || p.bestNote ? `<section class="d-sec"><div class="sec-h"><h3>Nên đi lúc nào?</h3></div><div class="card when"><span class="lbl">Khung giờ nên đến</span>${p.bestTime ? `<div class="t">${esc(p.bestTime)}</div>` : ""}${p.bestNote ? prose(p.bestNote) : ""}</div></section>` : "";
   const secs = p.sections.map((s) => `<section class="d-sec"><div class="sec-h"><h3>${esc(s.title)}</h3></div>${prose(s.body)}</section>`).join("");
   const foot = p.link || p.sources ? `<div class="d-sec">${p.link ? `<div class="actions"><a class="btn small ghost" href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener">Mở link tham khảo</a></div>` : ""}${p.sources ? `<p class="src">Nguồn: ${esc(p.sources)}</p>` : ""}</div>` : "";
@@ -664,6 +679,7 @@ document.addEventListener("click", (e) => {
     case "hideDone": ui.hideDone = !ui.hideDone; saveUi(); render(); break;
     case "togglePlace": { const p = PL[id]; if (!p) break; doneMap = { ...doneMap, [id]: !isDone(id) }; LS.set("done", doneMap); render(); if (isDone(id)) toast("Đã ghé: " + p.name); break; }
     case "openPlace": openPlace(id); break;
+    case "amap": { const p = PL[id]; if (p) openAmap(p); break; }
     case "closeDetail": closeDetail(); break;
     case "showPlace": { const p = PL[id]; if (p) show(p.zh || p.name, p.addrZh || p.area, p.name, !!p.addrZh); break; }
     case "showText": show(el.dataset.v, "", el.dataset.sub); break;
@@ -743,7 +759,13 @@ fetch("data.json").then((r) => r.json()).then((data) => {
     let reloading = false;
     const hadController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !reloading) { reloading = true; location.reload(); } });
-    navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(cacheImages).catch(() => { off.sw = false; render(); });
+    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => {
+      // check for a newer version on every launch and every time the app comes back to the foreground
+      const check = () => { if (navigator.onLine !== false) reg.update().catch(() => {}); };
+      check();
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+      return navigator.serviceWorker.ready;
+    }).then(cacheImages).catch(() => { off.sw = false; render(); });
   }
 }).catch(() => {
   $("#view").innerHTML = '<div class="empty"><b>Chưa tải được dữ liệu</b><span>Mở app một lần khi có mạng để lưu bản offline.</span></div>';
