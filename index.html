@@ -13,6 +13,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="leaflet.css">
+<script src="leaflet.js"></script>
 <style>
 /* Layout: mobile app — sticky header, one scrolling view per tab, fixed bottom tab bar, bottom-sheet forms. Motif: perforated postage stamps. */
 :root{
@@ -340,6 +342,42 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .lb-bar .btn.ghost{color:#fff;border-color:rgba(255,255,255,.4)}
 .lb-bar span{font-weight:700;font-variant-numeric:tabular-nums}
 
+/* map */
+.seg.seg2{grid-template-columns:1fr 1fr}
+.map-wrap{position:relative;isolation:isolate;height:min(58vh,520px);border-radius:20px;overflow:hidden;border:1.5px solid var(--line);background:var(--surface-2)}
+.map-wrap .map{position:absolute!important;inset:0;width:100%;height:100%;background:var(--surface-2)}
+.map-btns{position:absolute;right:10px;bottom:22px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+.map-btn{width:44px;height:44px;border-radius:14px;border:0;background:var(--surface);color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.25);display:grid;place-items:center}
+.leaflet-container{font:inherit}
+.leaflet-control-attribution{font-size:10px}
+.pin{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 15px var(--f-zh);color:#16300A;background:#8CD234;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .15s}
+.pin.hz{background:#B786F1;color:#1E0F38}
+.pin.both{background:linear-gradient(90deg,#8CD234 50%,#B786F1 50%)}
+.pin.must{box-shadow:0 0 0 3px #7B4CCF,0 2px 6px rgba(0,0,0,.35)}
+.pin.approx{border-style:dashed}
+.pin.done{background:#C2CCBB;color:#3E4A38}
+.pin.hotel{background:#1D3812;color:#fff;border-radius:10px}
+.pin.sel{transform:scale(1.3)}
+.me{width:20px;height:20px;border-radius:50%;background:#1A73E8;border:3px solid #fff;box-shadow:0 0 0 7px rgba(26,115,232,.22)}
+.map-card{gap:8px}
+.mc-top{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.mc-top h3{margin:0;font-size:17px}
+.mc-top .x{margin:-8px -8px 0 0}
+.near{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
+.near-row{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:11px 14px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:var(--ink)}
+.near-row:first-child{border-top:0}
+.near-dir{width:30px;height:30px;border-radius:50%;background:var(--surface-2);color:var(--grass-ink);display:grid;place-items:center}
+.near-main{min-width:0;display:flex;flex-direction:column}
+.near-main b{font-size:15px;line-height:1.3}
+.near-main span,.near-d span{font-size:12px;color:var(--ink-soft)}
+.near-d{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.near-d b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.near-empty{gap:6px}
+.miss summary{font-weight:700;cursor:pointer;min-height:28px}
+.miss[open] summary{margin-bottom:8px}
+.miss-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.miss-row .zh{color:var(--lilac-deep)}
+
 /* poses: tiles, strips and the full-screen pose viewer */
 .nav button i{width:46px}
 .pose-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -467,7 +505,7 @@ const isShot = (p, x, i) => !!posedMap[poseKey(p, x, i)];
 let ckMap = LS.get("ck", {});
 const isDone = (id) => !!doneMap[id];
 const ckDone = (c) => (c.text in ckMap ? ckMap[c.text] : c.done);
-const saveUi = () => LS.set("ui", { city: ui.city, cat: ui.cat, hideDone: ui.hideDone });
+const saveUi = () => LS.set("ui", { city: ui.city, cat: ui.cat, hideDone: ui.hideDone, view: ui.view });
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -516,6 +554,7 @@ function render() {
   if (!D) return;
   $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, poses: viewPoses, info: viewInfo })[ui.tab]();
   vnWrap($("#view"));
+  if (ui.tab === "places" && ui.view === "map") attachMap(); else stopGeo();
   renderDetail();
 }
 
@@ -616,6 +655,208 @@ function placeCard(p) {
   </article>`;
 }
 
+/* ---------- map (Amap tiles, GCJ-02 coordinates) ---------- */
+const TILE = "https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}";
+const tileUrl = (x, y, z) => `https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=${x}&y=${y}&z=${z}`;
+function wgs2gcj(lat, lng) {
+  if (lng < 72.004 || lng > 137.8347 || lat < 0.8293 || lat > 55.8271) return [lat, lng];
+  const a = 6378245.0, ee = 0.00669342162296594323, PI = Math.PI, x = lng - 105, y = lat - 35;
+  let dLat = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
+  dLat += ((20 * Math.sin(6 * x * PI) + 20 * Math.sin(2 * x * PI)) * 2) / 3 + ((20 * Math.sin(y * PI) + 40 * Math.sin((y / 3) * PI)) * 2) / 3 + ((160 * Math.sin((y / 12) * PI) + 320 * Math.sin((y * PI) / 30)) * 2) / 3;
+  let dLng = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
+  dLng += ((20 * Math.sin(6 * x * PI) + 20 * Math.sin(2 * x * PI)) * 2) / 3 + ((20 * Math.sin(x * PI) + 40 * Math.sin((x / 3) * PI)) * 2) / 3 + ((150 * Math.sin((x / 12) * PI) + 300 * Math.sin((x / 30) * PI)) * 2) / 3;
+  const rad = (lat / 180) * PI, magic = 1 - ee * Math.sin(rad) ** 2, sq = Math.sqrt(magic);
+  dLat = (dLat * 180) / (((a * (1 - ee)) / (magic * sq)) * PI);
+  dLng = (dLng * 180) / ((a / sq) * Math.cos(rad) * PI);
+  return [lat + dLat, lng + dLng];
+}
+function distM(a, b) {
+  const R = 6371000, r = Math.PI / 180, dLat = (b[0] - a[0]) * r, dLng = (b[1] - a[1]) * r;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function bearing(a, b) {
+  const r = Math.PI / 180, y = Math.sin((b[1] - a[1]) * r) * Math.cos(b[0] * r);
+  const x = Math.cos(a[0] * r) * Math.sin(b[0] * r) - Math.sin(a[0] * r) * Math.cos(b[0] * r) * Math.cos((b[1] - a[1]) * r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+const DIRS = ["Bắc", "Đông Bắc", "Đông", "Đông Nam", "Nam", "Tây Nam", "Tây", "Tây Bắc"];
+const fmtDist = (m) => (m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0).replace(".", ",")} km`);
+const walkTxt = (m) => (m <= 3000 ? `${Math.max(1, Math.round(m / 80))} phút đi bộ` : "nên đi metro hoặc Didi");
+const ARROW = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2l6 18-6-4-6 4z"/></svg>';
+
+let MAP = null, mapEl = null, markers = null, meMarker = null, meCircle = null, lastFit = "";
+let me = null, geoWatch = null, geoErr = "", centerOnFix = false;
+const hotels = () => (D ? D.info.bookings.map((b, i) => ({ ...b, id: "hotel-" + i })).filter((b) => b.kind === "hotel" && b.loc) : []);
+
+function viewMap(ps) {
+  const withLoc = ps.filter((p) => p.loc), noLoc = ps.filter((p) => !p.loc);
+  const sel = ui.mapSel && (PL[ui.mapSel] || hotels().find((h) => h.id === ui.mapSel));
+  let card = "";
+  if (sel && sel.id.startsWith("hotel-")) {
+    card = `<div class="card map-card"><div class="mc-top"><div style="min-width:0"><h3>${esc(sel.title)}</h3><div class="zh">${esc(sel.addrZh)}</div></div><button class="x" data-act="mapSel" data-id="" aria-label="Đóng">×</button></div>
+      <div class="meta"><span>Khách sạn</span>${me ? `<span>· ${fmtDist(distM([me.lat, me.lng], sel.loc))}</span>` : ""}${sel.locApprox ? "<span>· vị trí gần đúng</span>" : ""}</div>
+      <div class="actions"><button class="btn small lilac" data-act="showText" data-v="${esc(sel.addrZh)}" data-sub="${esc(sel.title)}">Đưa tài xế xem</button><button class="btn small ghost" data-act="amapHotel" data-id="${sel.id}">Mở Amap</button></div></div>`;
+  } else if (sel) {
+    const d = me ? distM([me.lat, me.lng], sel.loc) : null;
+    card = `<div class="card map-card"><div class="mc-top"><div style="min-width:0"><h3>${esc(sel.name)}</h3>${sel.zh ? `<div class="zh">${esc(sel.zh)}</div>` : ""}</div><button class="x" data-act="mapSel" data-id="" aria-label="Đóng">×</button></div>
+      <div class="meta">${sel.city ? `<span>${CITIES[sel.city]}</span><span>·</span>` : ""}<span>${CATS[sel.cat] || "Khác"}</span>${d != null ? `<span>· ${fmtDist(d)} · ${walkTxt(d)}</span>` : ""}${sel.locSrc === "gan-dung" ? "<span>· vị trí gần đúng</span>" : ""}</div>
+      <div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${sel.id}">Xem chi tiết</button>${sel.zh || sel.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${sel.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${sel.id}">Mở Amap</button></div></div>`;
+  }
+  let near = "";
+  if (me) {
+    const rows = withLoc.map((p) => ({ p, d: distM([me.lat, me.lng], p.loc), b: bearing([me.lat, me.lng], p.loc) })).sort((a, b) => a.d - b.d).slice(0, 10);
+    near = `<section class="sec"><div class="sec-h"><h2>Gần bạn nhất</h2><span class="meta">±${Math.round(me.acc)} m</span></div>
+      ${rows.length && rows[0].d > 50000 ? `<p class="note">Bạn đang cách các địa điểm ${fmtDist(rows[0].d)}. Danh sách sẽ có ích khi bạn tới Thượng Hải hoặc Hàng Châu.</p>` : ""}
+      <div class="near">${rows.map((r) => `<button class="near-row" data-act="mapSel" data-id="${r.p.id}">
+        <span class="near-dir" style="transform:rotate(${Math.round(r.b)}deg)">${ARROW}</span>
+        <span class="near-main"><b>${esc(r.p.name)}</b><span>${r.p.zh ? esc(r.p.zh) + " · " : ""}${DIRS[Math.round(r.b / 45) % 8]}${r.p.locSrc === "gan-dung" ? " · gần đúng" : ""}</span></span>
+        <span class="near-d"><b>${fmtDist(r.d)}</b><span>${walkTxt(r.d)}</span></span></button>`).join("")}</div></section>`;
+  } else {
+    near = `<div class="card near-empty"><b>Gần bạn nhất</b><span class="note">${geoErr || "Bật định vị để xem địa điểm nào gần bạn. Định vị dùng GPS nên vẫn chạy khi không có mạng."}</span><div class="actions"><button class="btn small" data-act="locate">Bật định vị</button></div></div>`;
+  }
+  const miss = noLoc.length ? `<details class="card miss"><summary>${noLoc.length} địa điểm chưa có vị trí trên bản đồ</summary>
+    <p class="note">Vẫn mở được bằng Amap. Muốn ghim lên bản đồ, thêm dòng "Tọa độ:" vào file địa điểm.</p>
+    <div class="list">${noLoc.map((p) => `<div class="miss-row"><span><b>${esc(p.name)}</b>${p.zh ? ` <span class="zh">${esc(p.zh)}</span>` : ""}</span><button class="btn small ghost" data-act="amap" data-id="${p.id}">Mở Amap</button></div>`).join("")}</div></details>` : "";
+  return `<div id="mapSlot" class="map-wrap"></div>${card}${near}${tilesCard()}${miss}`;
+}
+
+function pinIcon(p) {
+  const done = isDone(p.id), sel = ui.mapSel === p.id;
+  const cls = ["pin", p.city === "hz" ? "hz" : p.city === "both" ? "both" : "", done ? "done" : "", p.must ? "must" : "", p.locSrc === "gan-dung" ? "approx" : "", sel ? "sel" : ""].join(" ");
+  const ch = esc((p.zh || p.name).replace(/^[\s(（]+/, "").slice(0, 1));
+  return L.divIcon({ className: "", html: `<div class="${cls}">${done ? "✓" : ch}</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
+}
+function attachMap() {
+  const slot = $("#mapSlot");
+  if (!slot) return;
+  if (!window.L) { slot.innerHTML = '<div class="empty" style="margin:16px">Không tải được bản đồ. Mở lại app khi có mạng.</div>'; return; }
+  if (!MAP) {
+    mapEl = document.createElement("div");
+    mapEl.className = "map-wrap";
+    mapEl.innerHTML = `<div class="map"></div><div class="map-btns">
+      <button class="map-btn" data-act="locate" aria-label="Vị trí của tôi"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+      <button class="map-btn" data-act="fitAll" aria-label="Xem tất cả địa điểm"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>`;
+    MAP = L.map(mapEl.querySelector(".map"), { zoomControl: false, tap: false }).setView([31.23, 121.47], 12);
+    L.tileLayer(TILE, { subdomains: "1234", maxZoom: 18, attribution: "© 高德地图 Amap" }).addTo(MAP);
+    MAP.attributionControl.setPrefix(false);
+    markers = L.layerGroup().addTo(MAP);
+    MAP.on("click", () => { if (ui.mapSel) { ui.mapSel = null; render(); } });
+  }
+  slot.replaceWith(mapEl);
+  MAP.invalidateSize();
+  drawMarkers();
+  startGeo();
+}
+const CITY_BOX = { sh: [30.85, 31.5, 121.0, 121.95], hz: [30.0, 30.5, 119.65, 120.45] };
+const inCityBox = (c, loc) => { const b = CITY_BOX[c]; return !b || (loc[0] >= b[0] && loc[0] <= b[1] && loc[1] >= b[2] && loc[1] <= b[3]); };
+function mapList() {
+  return places().filter((p) => p.loc && (ui.city === "all" || ((p.city === ui.city || p.city === "both") && inCityBox(ui.city, p.loc)))
+    && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)));
+}
+function drawMarkers() {
+  markers.clearLayers();
+  const list = mapList();
+  for (const p of list) L.marker(p.loc, { icon: pinIcon(p), zIndexOffset: ui.mapSel === p.id ? 1000 : p.must ? 100 : 0 }).on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(p.id); }).addTo(markers);
+  for (const h of hotels()) {
+    if (ui.city !== "all" && !h.addrZh.includes(CITY_ZH[ui.city])) continue;
+    L.marker(h.loc, { icon: L.divIcon({ className: "", html: `<div class="pin hotel ${ui.mapSel === h.id ? "sel" : ""}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="2"/></svg></div>`, iconSize: [32, 32], iconAnchor: [16, 16] }), zIndexOffset: 500 })
+      .on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(h.id); }).addTo(markers);
+  }
+  const key = ui.city + "|" + ui.cat + "|" + ui.hideDone;
+  if (key !== lastFit) { lastFit = key; fitTo(list); }
+  drawMe();
+}
+function fitTo(list) {
+  const pts = list.map((p) => p.loc).concat(hotels().filter((h) => ui.city === "all" || h.addrZh.includes(CITY_ZH[ui.city])).map((h) => h.loc));
+  if (!pts.length) return;
+  if (pts.length === 1) MAP.setView(pts[0], 15, { animate: false }); else MAP.fitBounds(pts, { padding: [28, 28], maxZoom: 15, animate: false });
+}
+function selectOnMap(id) {
+  ui.mapSel = id;
+  const p = PL[id] || hotels().find((h) => h.id === id);
+  render();
+  if (p && MAP) MAP.setView(p.loc, Math.max(MAP.getZoom(), 15), { animate: false });
+}
+function drawMe() {
+  if (!MAP || !me) return;
+  const ll = [me.lat, me.lng];
+  if (!meMarker) {
+    meCircle = L.circle(ll, { radius: me.acc, color: "#1A73E8", weight: 1, fillOpacity: 0.1, interactive: false }).addTo(MAP);
+    meMarker = L.marker(ll, { icon: L.divIcon({ className: "", html: '<div class="me"></div>', iconSize: [20, 20], iconAnchor: [10, 10] }), interactive: false, zIndexOffset: 2000 }).addTo(MAP);
+  } else { meMarker.setLatLng(ll); meCircle.setLatLng(ll).setRadius(me.acc); }
+}
+function startGeo() {
+  if (geoWatch !== null || !navigator.geolocation) return;
+  geoWatch = navigator.geolocation.watchPosition((pos) => {
+    const [lat, lng] = wgs2gcj(pos.coords.latitude, pos.coords.longitude);
+    const prev = me;
+    me = { lat, lng, acc: pos.coords.accuracy || 50 };
+    geoErr = "";
+    drawMe();
+    if (centerOnFix && MAP) { centerOnFix = false; MAP.setView([lat, lng], 16, { animate: false }); }
+    if (!prev || distM([prev.lat, prev.lng], [lat, lng]) > 25) render();
+  }, (err) => {
+    geoErr = err.code === 1 ? "Chưa cho phép định vị. Vào Cài đặt › Quyền riêng tư & Bảo mật › Dịch vụ định vị, bật cho Safari (hoặc Trang web Safari), rồi mở lại app."
+      : "Chưa lấy được vị trí. Ra chỗ thoáng hoặc thử lại sau ít giây.";
+    stopGeo();
+    if (ui.tab === "places" && ui.view === "map") render();
+  }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+}
+function stopGeo() { if (geoWatch !== null) { navigator.geolocation.clearWatch(geoWatch); geoWatch = null; } }
+
+/* offline map tiles around every pinned place */
+function tileList() {
+  const set = new Set(), add = (z, x, y) => set.add(z + "/" + x + "/" + y);
+  const t = (lat, lng, z) => {
+    const n = 2 ** z, r = (lat * Math.PI) / 180;
+    return [Math.floor(((lng + 180) / 360) * n), Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n)];
+  };
+  const pts = places().filter((p) => p.loc).map((p) => p.loc).concat(hotels().map((h) => h.loc));
+  for (const [lat, lng] of pts) {
+    for (const [z, rad] of [[12, 0], [13, 0], [14, 1], [15, 1], [16, 1]]) {
+      const [x, y] = t(lat, lng, z);
+      for (let dx = -rad; dx <= rad; dx++) for (let dy = -rad; dy <= rad; dy++) add(z, x + dx, y + dy);
+    }
+  }
+  for (const [box] of [[[30.95, 31.45, 121.2, 121.75]], [[30.12, 30.4, 119.95, 120.3]]]) // city overviews
+    for (const z of [10, 11]) { const [x0, y0] = t(box[1], box[2], z), [x1, y1] = t(box[0], box[3], z); for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) add(z, x, y); }
+  return [...set].map((k) => { const [z, x, y] = k.split("/"); return tileUrl(x, y, z); });
+}
+const tiles = { running: false, done: 0, total: 0, err: 0 };
+function tilesCard() {
+  const list = tileList(), saved = LS.get("tilesSaved", { n: 0, total: 0 });
+  const upToDate = saved.total === list.length && saved.n >= list.length * 0.97;
+  let msg, btn = "";
+  if (tiles.running) msg = `Đang lưu bản đồ: ${tiles.done}/${tiles.total} ô…`;
+  else if (upToDate) msg = `Đã lưu bản đồ quanh ${places().filter((p) => p.loc).length} địa điểm. Xem được khi không có mạng (phóng to tới mức đường phố).`;
+  else { msg = `Lưu sẵn nền bản đồ quanh các địa điểm để xem khi mất mạng: ${list.length} ô, khoảng ${Math.max(1, Math.round(list.length * 0.018))} MB. Nên tải khi có wifi.`; btn = `<div class="actions"><button class="btn small" data-act="saveTiles">${saved.n ? "Tải lại bản đồ offline" : "Tải bản đồ offline"}</button></div>`; }
+  return `<div class="card offline ${upToDate ? "ok" : ""}"><div class="row"><span class="dot"></span><span>${msg}</span></div>${tiles.running ? `<div class="bar"><i style="width:${Math.round((tiles.done / Math.max(1, tiles.total)) * 100)}%"></i></div>` : ""}${btn}</div>`;
+}
+async function saveTiles() {
+  if (tiles.running || !("caches" in window)) return;
+  const list = tileList();
+  Object.assign(tiles, { running: true, done: 0, total: list.length, err: 0 });
+  render();
+  const c = await caches.open("tiles-v1"), queue = [...list];
+  let last = 0;
+  const worker = async () => {
+    while (queue.length) {
+      const u = queue.shift();
+      try {
+        if (!(await c.match(u))) { const r = await fetch(u, { mode: "cors" }); if (r.ok) await c.put(u, r); else tiles.err++; }
+        tiles.done++;
+      } catch (e) { tiles.err++; tiles.done++; }
+      if (Date.now() - last > 500) { last = Date.now(); if (ui.view === "map" && ui.tab === "places") render(); }
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
+  tiles.running = false;
+  LS.set("tilesSaved", { n: tiles.done - tiles.err, total: list.length });
+  if (tiles.err) toast(`Còn ${tiles.err} ô chưa tải được. Bấm tải lại khi mạng ổn định.`); else toast("Đã lưu bản đồ offline");
+  render();
+}
+
 function viewPlaces() {
   const all = places();
   const ps = all.filter((p) => (ui.city === "all" || p.city === ui.city || p.city === "both") && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
@@ -624,8 +865,10 @@ function viewPlaces() {
   const seg = `<div class="seg" role="group" aria-label="Thành phố">${["all", "sh", "hz"].map((c) => `<button data-act="city" data-v="${c}" aria-pressed="${ui.city === c}">${c === "all" ? "Tất cả" : CITIES[c]} ${cnt(c)}</button>`).join("")}</div>`;
   const chips = `<div class="chips" role="group" aria-label="Loại">${[["all", "Mọi loại"], ...Object.entries(CATS)].map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}</button>`).join("")}</div>`;
   const tog = `<div class="toggle-row"><span>${ps.length} địa điểm</span><button class="switch" data-act="hideDone" aria-pressed="${ui.hideDone}"><i></i>Ẩn chỗ đã đi</button></div>`;
+  const vt = `<div class="seg seg2" role="group" aria-label="Cách xem"><button data-act="view" data-v="list" aria-pressed="${ui.view !== "map"}">Danh sách</button><button data-act="view" data-v="map" aria-pressed="${ui.view === "map"}">Bản đồ</button></div>`;
+  if (ui.view === "map") return vt + seg + chips + tog + viewMap(ps);
   const body = ps.length ? `<div class="list">${ps.map(placeCard).join("")}</div>` : '<div class="empty"><b>Không có địa điểm nào khớp bộ lọc</b><span>Thử chọn "Tất cả" hoặc "Mọi loại".</span></div>';
-  return seg + chips + tog + body;
+  return vt + seg + chips + tog + body;
 }
 
 function tlItem(p) {
@@ -715,7 +958,7 @@ function renderDetail() {
   const addr = `<section class="d-sec"><div class="sec-h"><h3>Địa chỉ và cách đi</h3></div><div class="card addr">
     ${p.addrZh ? `<div class="zh-big">${esc(p.addrZh)}</div>` : ""}
     ${p.addrVi ? `<div class="en">${esc(p.addrVi)}</div>` : !p.addrZh ? `<div class="en">${esc(p.area || "Chưa có địa chỉ.")}</div>` : ""}
-    <div class="actions">${p.addrZh ? `<button class="btn small" data-act="copy" data-v="${esc(p.addrZh)}">Sao chép địa chỉ</button>` : ""}${p.zh || p.addrZh ? `<button class="btn small lilac" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${p.id}">Mở app Amap</button><a class="btn small ghost" href="${appleMapUrl(p)}">Bản đồ Apple</a></div></div></section>`;
+    <div class="actions">${p.addrZh ? `<button class="btn small" data-act="copy" data-v="${esc(p.addrZh)}">Sao chép địa chỉ</button>` : ""}${p.zh || p.addrZh ? `<button class="btn small lilac" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${p.id}">Mở app Amap</button>${p.loc ? `<button class="btn small ghost" data-act="showOnMap" data-id="${p.id}">Xem trên bản đồ</button>` : ""}<a class="btn small ghost" href="${appleMapUrl(p)}">Bản đồ Apple</a></div></div></section>`;
   const when = p.bestTime || p.bestNote ? `<section class="d-sec"><div class="sec-h"><h3>Nên đi lúc nào?</h3></div><div class="card when"><span class="lbl">Khung giờ nên đến</span>${p.bestTime ? `<div class="t">${esc(p.bestTime)}</div>` : ""}${p.bestNote ? prose(p.bestNote) : ""}</div></section>` : "";
   const secs = p.sections.map((s) => `<section class="d-sec"><div class="sec-h"><h3>${esc(s.title)}</h3></div>${prose(s.body)}</section>`).join("");
   const foot = p.link || p.sources ? `<div class="d-sec">${p.link ? `<div class="actions"><a class="btn small ghost" href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener">Mở link tham khảo</a></div>` : ""}${p.sources ? `<p class="src">Nguồn: ${esc(p.sources)}</p>` : ""}</div>` : "";
@@ -861,6 +1104,13 @@ document.addEventListener("click", (e) => {
       break;
     }
     case "hideShot": ui.hideShot = !ui.hideShot; render(); break;
+    case "view": ui.view = el.dataset.v; saveUi(); render(); window.scrollTo(0, 0); break;
+    case "mapSel": if (id) selectOnMap(id); else { ui.mapSel = null; render(); } break;
+    case "locate": centerOnFix = true; geoErr = ""; if (me && MAP) { centerOnFix = false; MAP.setView([me.lat, me.lng], 16, { animate: false }); } stopGeo(); startGeo(); if (!me) toast("Đang tìm vị trí của bạn…"); break;
+    case "fitAll": if (MAP) fitTo(mapList()); break;
+    case "saveTiles": saveTiles(); break;
+    case "amapHotel": { const h = hotels().find((x) => x.id === id); if (h) openAmap({ name: h.title, addrZh: h.addrZh, city: h.addrZh.includes("上海") ? "sh" : "hz" }); break; }
+    case "showOnMap": closeDetail(); ui.tab = "places"; ui.view = "map"; saveUi(); setTimeout(() => selectOnMap(id), 50); break;
     case "lbPrev": lb.i--; drawLb(); break;
     case "lbNext": if (lb && lb.ids.length > 1) { lb.i++; drawLb(); } break;
     case "day": ui.day = +el.dataset.v; render(); break;
