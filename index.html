@@ -241,7 +241,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 
 /* bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 8px}
+.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px}
 .nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:11px;font-weight:700;color:var(--ink-soft);min-height:56px}
 .nav button i{display:grid;place-items:center;width:52px;height:30px;border-radius:99px}
 .nav button svg{width:22px;height:22px}
@@ -339,6 +339,48 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .lb-bar{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 16px;color:#fff}
 .lb-bar .btn.ghost{color:#fff;border-color:rgba(255,255,255,.4)}
 .lb-bar span{font-weight:700;font-variant-numeric:tabular-nums}
+
+/* poses: tiles, strips and the full-screen pose viewer */
+.nav button i{width:46px}
+.pose-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pose-strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,44%);gap:10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;margin-inline:-16px;padding-inline:16px;padding-block:2px}
+.pose-strip::-webkit-scrollbar{display:none}
+.pose-strip .pose{scroll-snap-align:start}
+.pose{position:relative;padding:0;border:1.5px solid var(--line);background:var(--surface);border-radius:18px;overflow:hidden;text-align:left;display:flex;flex-direction:column;min-width:0;color:var(--ink)}
+.pose .ph{display:grid;place-items:center;aspect-ratio:3/4;width:100%;max-width:100%;background:var(--surface-2);color:var(--ink-soft);font-size:13px}
+.pose .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pose.done .ph img{opacity:.55}
+.pose .cap{display:flex;flex-direction:column;gap:2px;padding:8px 10px 10px}
+.pose .cap b{font-size:14px;line-height:1.3}
+.pose .cap span{font-size:12px;color:var(--ink-soft);line-height:1.35}
+.pose .cap b,.pose .cap span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.pose .badge{position:absolute;top:8px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,.55);color:#fff}
+.pose .badge.multi{left:8px}
+.pose .badge.shot{right:8px;background:var(--grass)}
+.pg{display:flex;flex-direction:column;gap:10px}
+.pg-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.pg-head h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:19px;line-height:1.2}
+.pg-head .zh{font-size:14px;color:var(--lilac-deep);font-weight:600}
+.pg-head .meta{flex:none}
+.pv{position:fixed;inset:0;z-index:36;background:#0B0F09;color:#F1F7EC;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.pv-top{display:flex;align-items:center;gap:8px;padding:10px 16px}
+.pv-top .grow{flex:1}
+.pv-top .count{font-weight:700;font-variant-numeric:tabular-nums}
+.pv .btn.ghost{color:#F1F7EC;border-color:rgba(255,255,255,.4)}
+.pv-img{flex:1;min-height:0;position:relative;display:grid;place-items:center;padding:0 8px;touch-action:pan-y;color:#9fb394}
+.pv-img img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px}
+.pv-dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+.pv-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35)}
+.pv-dots i.on{background:#fff}
+.pv-info{max-height:42%;overflow-y:auto;background:#162012;border-radius:22px 22px 0 0;padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.pv-place{font-size:12px;font-weight:700;letter-spacing:.04em;color:#B9D7A6;text-transform:uppercase}
+.pv-info h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1.2;text-wrap:balance}
+.pv-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pv-chips span{font-size:13px;padding:4px 10px;border-radius:12px;background:rgba(255,255,255,.08);line-height:1.35}
+.pv-chips b{font-weight:700;color:#D9B8FF;margin-right:4px}
+.pv-info .prose{color:#DCE8D4;font-size:14px}
+.pv-nav{display:flex;gap:8px}
+.pv-nav .btn{flex:1}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 html,body{margin:0}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -371,12 +413,14 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
     <button data-tab="home"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a2 2 0 0 1-2 2h-3v-6H9v6H6a2 2 0 0 1-2-2z"/></svg></i>Tổng quan</button>
     <button data-tab="places"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i>Địa điểm</button>
     <button data-tab="plan"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg></i>Lịch trình</button>
+    <button data-tab="poses"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i>Tạo dáng</button>
     <button data-tab="info"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4z"/><path d="M14 5v14" stroke-dasharray="2 2.5"/></svg></i>Thông tin</button>
   </div>
 </nav>
 
 <div class="detail" id="detail" hidden></div>
 <div class="lb" id="lb" hidden></div>
+<div class="pv" id="pv" hidden></div>
 <button class="show" id="show" hidden data-act="hideShow"></button>
 <div class="toast" id="toast" hidden></div>
 
@@ -417,6 +461,9 @@ const LS = {
 };
 Object.assign(ui, LS.get("ui", {}), { tab: "home", day: null });
 let doneMap = LS.get("done", {});
+let posedMap = LS.get("posed", {});
+const poseKey = (p, x, i) => `${p.id}|${x.title || x.photos[0] || i}`;
+const isShot = (p, x, i) => !!posedMap[poseKey(p, x, i)];
 let ckMap = LS.get("ck", {});
 const isDone = (id) => !!doneMap[id];
 const ckDone = (c) => (c.text in ckMap ? ckMap[c.text] : c.done);
@@ -462,12 +509,12 @@ function dayCity(i) { return [...new Set(planItems().filter((p) => p.day === i).
 const byTime = (a, b) => (a.time || "99").localeCompare(b.time || "99");
 
 /* ---------- render ---------- */
-const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", info: "Thông tin chuyến đi" };
+const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", poses: "Ảnh tạo dáng", info: "Thông tin chuyến đi" };
 function render() {
   document.querySelectorAll(".nav button").forEach((b) => { if (b.dataset.tab === ui.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   $("#pageTitle span").textContent = TITLES[ui.tab];
   if (!D) return;
-  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, info: viewInfo })[ui.tab]();
+  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, poses: viewPoses, info: viewInfo })[ui.tab]();
   vnWrap($("#view"));
   renderDetail();
 }
@@ -557,7 +604,7 @@ function placeCard(p) {
       ${done ? '<span class="pm">ĐÃ GHÉ</span>' : ""}
       <button class="check" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}" aria-label="Đánh dấu đã đi">${ICON_CHECK}</button>
     </div>
-    <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
+    <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
     ${p.photos.length ? `<button class="card-main" data-act="openPlace" data-id="${p.id}" aria-label="Xem ${esc(p.name)}"><img class="pc-img" src="${p.photos[0]}" alt="" loading="lazy"></button>` : ""}
     ${p.note ? `<p class="note">${esc(clip(p.note.split("\n")[0], 140))}</p>` : ""}
@@ -677,7 +724,7 @@ function renderDetail() {
       <span class="grow"></span>
       <button class="btn small ${done ? "" : "ghost"}" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}">${done ? "✓ Đã ghé" : "Đánh dấu đã ghé"}</button>
     </div></div>
-    <div class="wrap"><div class="d-body">${gal}${head}${status}${intro}${dishSec}${addr}${when}${secs}${foot}</div></div>`;
+    <div class="wrap"><div class="d-body">${gal}${head}${status}${intro}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}</div></div>`;
   vnWrap(box);
   if (wasHidden) { box.hidden = false; box.scrollTop = 0; document.body.style.overflow = "hidden"; } else box.scrollTop = sc;
 }
@@ -691,6 +738,75 @@ function closeDetail() {
   if (detailPushed) { detailPushed = false; history.back(); setTimeout(() => { if (detailId === id) { detailId = null; renderDetail(); } }, 400); }
   else { try { history.replaceState(null, "", "#" + ui.tab); } catch (e) {} detailId = null; renderDetail(); }
 }
+/* ---------- poses ---------- */
+function poseTile(p, x, i) {
+  const shot = isShot(p, x, i), sub = [x.spot, x.angle, x.time].filter(Boolean).join(" · ");
+  return `<button class="pose ${shot ? "done" : ""}" data-act="openPose" data-id="${p.id}" data-i="${i}" aria-label="Xem dáng ${esc(x.title || i + 1)}">
+    <span class="ph">${x.photos.length ? `<img src="${x.photos[0]}" alt="" loading="lazy">` : "Chưa có ảnh"}</span>
+    ${x.photos.length > 1 ? `<span class="badge multi">${x.photos.length} ảnh</span>` : ""}${shot ? '<span class="badge shot">✓ Đã chụp</span>' : ""}
+    ${x.title || sub ? `<span class="cap">${x.title ? `<b>${esc(x.title)}</b>` : ""}${sub ? `<span>${esc(sub)}</span>` : ""}</span>` : ""}
+  </button>`;
+}
+function poseSection(p) {
+  const ps = p.poses || [];
+  if (!ps.length) return "";
+  const shot = ps.filter((x, i) => isShot(p, x, i)).length;
+  return `<section class="d-sec"><div class="sec-h"><h3>Tạo dáng</h3><span class="tag">${shot}/${ps.length} đã chụp</span></div>
+    <div class="pose-grid">${ps.map((x, i) => poseTile(p, x, i)).join("")}</div></section>`;
+}
+function viewPoses() {
+  const withPoses = places().filter((p) => (p.poses || []).length);
+  const inCity = (c) => withPoses.filter((p) => c === "all" || p.city === c || p.city === "both");
+  const count = (list) => list.reduce((s, p) => s + p.poses.length, 0);
+  const seg = `<div class="seg" role="group" aria-label="Thành phố">${["all", "sh", "hz"].map((c) => `<button data-act="city" data-v="${c}" aria-pressed="${ui.city === c}">${c === "all" ? "Tất cả" : CITIES[c]} ${count(inCity(c))}</button>`).join("")}</div>`;
+  if (!withPoses.length) {
+    return `<div class="empty"><b>Chưa có ảnh tạo dáng nào</b><span>Thêm mục "## Tạo dáng" vào file địa điểm, hoặc bỏ ảnh vào thư mục anh/ten-dia-diem/tao-dang/, rồi đồng bộ.</span></div>`;
+  }
+  const list = inCity(ui.city).sort((a, b) => (b.must ? 1 : 0) - (a.must ? 1 : 0) || a.name.localeCompare(b.name, "vi"));
+  let total = 0, shot = 0;
+  const groups = list.map((p) => {
+    const items = p.poses.map((x, i) => ({ x, i, s: isShot(p, x, i) }));
+    total += items.length; shot += items.filter((t) => t.s).length;
+    const shown = ui.hideShot ? items.filter((t) => !t.s) : items;
+    if (!shown.length) return "";
+    return `<section class="pg"><div class="pg-head"><div style="min-width:0"><h2>${esc(p.name)}</h2>${p.zh ? `<div class="zh">${esc(p.zh)}</div>` : ""}</div>
+      <button class="link" data-act="openPlace" data-id="${p.id}" style="flex:none">Địa điểm ›</button></div>
+      <div class="pose-strip">${shown.map((t) => poseTile(p, t.x, t.i)).join("")}</div>
+      <div class="meta">${items.filter((t) => t.s).length}/${items.length} dáng đã chụp${p.city ? ` · ${CITIES[p.city]}` : ""}</div></section>`;
+  }).join("");
+  const tog = `<div class="toggle-row"><span>${shot}/${total} dáng đã chụp</span><button class="switch" data-act="hideShot" aria-pressed="${!!ui.hideShot}"><i></i>Ẩn dáng đã chụp</button></div>`;
+  return seg + tog + (groups || '<div class="empty"><span>Không còn dáng nào ở đây. Tắt "Ẩn dáng đã chụp" để xem lại.</span></div>');
+}
+let pv = null;
+function openPose(pid, i) { pv = { pid, i, j: 0 }; drawPv(); }
+function drawPv() {
+  const el = $("#pv"), p = pv && PL[pv.pid];
+  if (!p || !(p.poses || []).length) { el.hidden = true; pv = null; return; }
+  const n = p.poses.length; pv.i = (pv.i + n) % n;
+  const x = p.poses[pv.i], m = x.photos.length; pv.j = m ? (pv.j + m) % m : 0;
+  const shot = isShot(p, x, pv.i);
+  const chips = [["Chỗ đứng", x.spot], ["Góc chụp", x.angle], ["Thời điểm", x.time], ["Trang phục", x.outfit], ["Đạo cụ", x.props]]
+    .filter((c) => c[1]).map((c) => `<span><b>${c[0]}</b>${esc(c[1])}</span>`).join("");
+  el.innerHTML = `<div class="pv-top"><button class="btn small ghost" data-act="pvClose">Đóng</button><span class="grow"></span><span class="count">${n > 1 ? `${pv.i + 1}/${n}` : ""}</span><span class="grow"></span>
+      <button class="btn small ${shot ? "" : "ghost"}" data-act="pvShot" aria-pressed="${shot}">${shot ? "✓ Đã chụp" : "Đánh dấu đã chụp"}</button></div>
+    <div class="pv-img" data-act="pvPhoto">${m ? `<img src="${x.photos[pv.j]}" alt="">` : "Chưa có ảnh mẫu"}${m > 1 ? `<div class="pv-dots">${x.photos.map((_, k) => `<i class="${k === pv.j ? "on" : ""}"></i>`).join("")}</div>` : ""}</div>
+    <div class="pv-info"><div class="pv-place">${esc(p.name)}${p.zh ? ` · ${esc(p.zh)}` : ""}</div>
+      ${x.title ? `<h3>${esc(x.title)}</h3>` : ""}${chips ? `<div class="pv-chips">${chips}</div>` : ""}${x.note ? prose(x.note) : ""}
+      ${n > 1 ? '<div class="pv-nav"><button class="btn ghost" data-act="pvPrev">‹ Dáng trước</button><button class="btn ghost" data-act="pvNext">Dáng sau ›</button></div>' : ""}</div>`;
+  vnWrap(el.querySelector(".pv-info"));
+  el.hidden = false;
+}
+// swipe left / right on the photo to change pose
+(() => {
+  let sx = 0, sy = 0;
+  document.addEventListener("touchstart", (e) => { if (e.target.closest(".pv-img")) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (!pv || !e.target.closest(".pv-img")) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) { pv.i += dx < 0 ? 1 : -1; pv.j = 0; drawPv(); pv.swiped = Date.now(); }
+  }, { passive: true });
+})();
+
 function drawLb() {
   const el = $("#lb");
   if (!lb || !lb.ids.length) { el.hidden = true; lb = null; return; }
@@ -732,6 +848,19 @@ document.addEventListener("click", (e) => {
     case "lbOpen": { const p = PL[detailId]; if (p) { lb = { ids: p.photos, i: +el.dataset.i }; drawLb(); } break; }
     case "dishPhoto": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.photo) { lb = { ids: [d.photo], i: 0 }; drawLb(); } break; }
     case "lbClose": lb = null; drawLb(); break;
+    case "openPose": openPose(id, +el.dataset.i); break;
+    case "pvClose": pv = null; drawPv(); break;
+    case "pvPrev": pv.i--; pv.j = 0; drawPv(); break;
+    case "pvNext": pv.i++; pv.j = 0; drawPv(); break;
+    case "pvPhoto": if (pv && !(pv.swiped && Date.now() - pv.swiped < 400)) { pv.j++; drawPv(); } break;
+    case "pvShot": {
+      const p = PL[pv.pid], x = p.poses[pv.i], k = poseKey(p, x, pv.i);
+      posedMap = { ...posedMap, [k]: !posedMap[k] }; LS.set("posed", posedMap);
+      drawPv(); render();
+      if (posedMap[k]) toast("Đã chụp dáng này");
+      break;
+    }
+    case "hideShot": ui.hideShot = !ui.hideShot; render(); break;
     case "lbPrev": lb.i--; drawLb(); break;
     case "lbNext": if (lb && lb.ids.length > 1) { lb.i++; drawLb(); } break;
     case "day": ui.day = +el.dataset.v; render(); break;
@@ -747,7 +876,7 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
-  if (lb) { lb = null; drawLb(); } else if (!$("#show").hidden) $("#show").hidden = true; else if (detailId) closeDetail();
+  if (pv) { pv = null; drawPv(); } else if (lb) { lb = null; drawLb(); } else if (!$("#show").hidden) $("#show").hidden = true; else if (detailId) closeDetail();
 });
 function fromHash() {
   const h = location.hash.slice(1);
