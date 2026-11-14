@@ -312,6 +312,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .prose{font-size:15px;line-height:1.6;display:flex;flex-direction:column;gap:8px;overflow-wrap:anywhere}
 .prose p{margin:0}
 .prose ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.prose h4{margin:6px 0 0;font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.3}
+.prose blockquote{margin:2px 0;padding:10px 14px;border-left:4px solid var(--line);background:var(--surface-2);border-radius:0 12px 12px 0;font-size:16px;line-height:1.7}
+.d-mode{position:sticky;top:64px;z-index:3;box-shadow:var(--shadow)}
+.toc{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
+.toc button{border:0;border-top:1px solid var(--line);background:transparent;padding:11px 16px;font-size:14px;font-weight:700;color:var(--ink);text-align:left;display:flex;justify-content:space-between;gap:10px}
+.toc button:first-child{border-top:0}
+.toc button::after{content:"›";color:var(--ink-soft)}
 .tbl{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;border:1.5px solid var(--line);border-radius:14px;
   background:linear-gradient(to right,var(--bg) 40%,transparent) left/28px 100% no-repeat local,linear-gradient(to left,var(--bg) 40%,transparent) right/28px 100% no-repeat local,
   radial-gradient(farthest-side at 0 50%,rgba(0,0,0,.2),transparent) left/12px 100% no-repeat scroll,radial-gradient(farthest-side at 100% 50%,rgba(0,0,0,.2),transparent) right/12px 100% no-repeat scroll;
@@ -1073,16 +1080,20 @@ function viewInfo() {
 }
 
 /* ---------- detail ---------- */
-let detailId = null, lb = null;
+let detailId = null, lb = null, detailMode = "visit";
 function prose(text) {
-  let html = "", ul = [], tbl = [];
+  let html = "", ul = [], tbl = [], qt = [];
   const flush = () => {
+    if (qt.length) { html += `<blockquote>${qt.map(esc).join("<br>")}</blockquote>`; qt = []; }
     if (ul.length) { html += `<ul>${ul.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>`; ul = []; }
     if (tbl.length) { html += `<div class="tbl"><table>${tbl.map((r, i) => `<tr>${r.map((c) => (i === 0 ? `<th>${esc(c)}</th>` : `<td>${esc(c)}</td>`)).join("")}</tr>`).join("")}</table></div>`; tbl = []; }
   };
   for (const raw of String(text || "").split(/\r?\n/)) {
     const l = raw.trim();
     if (!l) { flush(); continue; }
+    if (/^>\s?/.test(l)) { if (ul.length || tbl.length) flush(); qt.push(l.replace(/^>\s?/, "")); continue; }
+    if (qt.length) flush();
+    if (/^#{3,6}\s+/.test(l)) { flush(); html += `<h4>${esc(l.replace(/^#+\s+/, ""))}</h4>`; continue; }
     if (/^\|?\s*:?-{2,}/.test(l)) continue;
     if (l.includes("|")) { if (ul.length) flush(); tbl.push(l.replace(/^\||\|$/g, "").split("|").map((s) => s.trim())); continue; }
     if (/^[-•*]\s+/.test(l)) { if (tbl.length) flush(); ul.push(l.replace(/^[-•*]\s+/, "")); continue; }
@@ -1117,17 +1128,23 @@ function renderDetail() {
   const rel = parents.length || inRoutes.length ? `<div class="links">${parents.map((x) => `<button class="btn small ghost" data-act="openPlace" data-id="${x.id}">Nằm trong: ${esc(x.name)} ›</button>`).join("")}${inRoutes.map((r) => `<button class="btn small ghost" data-act="goRoute" data-id="${r.id}">Cung đường: ${esc(r.name)} ›</button>`).join("")}</div>` : "";
   const secs = p.sections.map((s) => `<section class="d-sec"><div class="sec-h"><h3>${esc(s.title)}</h3></div>${prose(s.body)}</section>`).join("");
   const foot = p.link || p.sources ? `<div class="d-sec">${p.link ? `<div class="actions"><a class="btn small ghost" href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener">Mở link tham khảo</a></div>` : ""}${p.sources ? `<p class="src">Nguồn: ${esc(p.sources)}</p>` : ""}</div>` : "";
+  const cul = p.culture || [], learn = cul.length && detailMode === "learn";
+  const modeSeg = cul.length ? `<div class="seg seg2 d-mode" role="group" aria-label="Nội dung"><button data-act="detailMode" data-v="visit" aria-pressed="${!learn}">Tham quan</button><button data-act="detailMode" data-v="learn" aria-pressed="${!!learn}">Hiểu nơi đây</button></div>` : "";
+  const learnBody = learn ? `${cul.filter((c) => c.title).length > 1 ? `<nav class="toc" aria-label="Mục lục">${cul.map((c, i) => c.title ? `<button data-act="tocGo" data-i="${i}">${esc(c.title)}</button>` : "").join("")}</nav>` : ""}
+    ${cul.map((c, i) => `<section class="d-sec learn" id="cul-${i}">${c.title ? `<div class="sec-h"><h3>${esc(c.title)}</h3></div>` : ""}${prose(c.body)}</section>`).join("")}
+    <div class="actions"><button class="btn small ghost" data-act="detailMode" data-v="visit">← Về thông tin tham quan</button></div>` : "";
   box.innerHTML = `<div class="d-top"><div class="wrap">
       <button class="icon-btn" data-act="closeDetail" aria-label="Quay lại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
       <span class="grow"></span>
       <button class="btn small ${done ? "" : "ghost"}" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}">${done ? "✓ Đã ghé" : "Đánh dấu đã ghé"}</button>
     </div></div>
-    <div class="wrap"><div class="d-body">${gal}${head}${rel}${status}${intro}${insideSec}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}</div></div>`;
+    <div class="wrap"><div class="d-body">${gal}${head}${modeSeg}${learn ? learnBody : `${rel}${status}${intro}${insideSec}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}`}</div></div>`;
   vnWrap(box);
   if (wasHidden) { box.hidden = false; box.scrollTop = 0; document.body.style.overflow = "hidden"; } else box.scrollTop = sc;
 }
 let detailPushed = false;
 function openPlace(id) {
+  if (detailId !== id) detailMode = "visit";
   detailId = id; renderDetail();
   if (location.hash !== "#place-" + id) { detailPushed = true; location.hash = "place-" + id; }
 }
@@ -1214,6 +1231,9 @@ document.addEventListener("click", (e) => {
     case "openPlace": openPlace(id); break;
     case "amap": { const p = PL[id]; if (p) openAmap(p); break; }
     case "closeDetail": closeDetail(); break;
+    case "detailMode": { if (detailMode !== el.dataset.v) { detailMode = el.dataset.v; const box = $("#detail"), m = box.querySelector(".d-mode"), y = m ? m.offsetTop - 70 : 0; renderDetail(); if (box.scrollTop > y) box.scrollTop = Math.max(0, y); } break; }
+    case "tocGo": { const t = $("#cul-" + el.dataset.i), box = $("#detail"), top = box.querySelector(".d-top"), m = box.querySelector(".d-mode");
+      if (t) box.scrollTop = Math.max(0, t.offsetTop - (top ? top.offsetHeight : 64) - (m ? m.offsetHeight : 0) - 16); break; }
     case "showPlace": { const p = PL[id]; if (p) show(p.zh || p.name, p.addrZh || p.area, p.name, !!p.addrZh); break; }
     case "showText": show(el.dataset.v, "", el.dataset.sub); break;
     case "showPhrase": { const p = PHRASES[+el.dataset.i]; show(p[0], p[1], p[2]); break; }
