@@ -1,5 +1,5 @@
 // Service worker: keeps the whole notebook available offline.
-const VERSION = "9a236bef7f";
+const VERSION = "df2699868d";
 const CORE = ["./", "index.html", "data.json", "manifest.webmanifest", "leaflet.js", "leaflet.css", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
 const CORE_CACHE = "core-" + VERSION;
 const IMG_CACHE = "anh-v1"; // image file names are content hashes, so this cache survives updates
