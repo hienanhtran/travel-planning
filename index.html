@@ -482,6 +482,24 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 .inside{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
 .inside .near-row{grid-template-columns:1fr auto}
 .links{display:flex;flex-wrap:wrap;gap:8px}
+/* info: one card for all hotels, "Hiểu nơi đây" card */
+.hotels{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden}
+.hotels-h{display:flex;align-items:center;gap:12px;padding:14px 14px 4px}
+.hotels-h b{font-family:var(--f-display);font-weight:800;font-size:18px}
+.hotel{display:flex;flex-direction:column;gap:6px;padding:12px 14px 14px;border-top:1px solid var(--line)}
+.hotels-h + .hotel{border-top:0}
+.hotel h3{margin:0;font-size:16px}
+.hotel .zh{font-size:17px;font-weight:700}
+.learn-card{display:flex;flex-direction:column;gap:14px}
+.learn-cities{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lc{border:0;border-radius:16px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:2px;background:var(--pc-bg);color:var(--pc-ink);min-width:0}
+.lc.hz{background:var(--pc2-bg);color:var(--pc2-ink)}
+.lc .zh{font-family:var(--f-zh);font-weight:900;font-size:26px;line-height:1.1;color:var(--pc-zh)}
+.lc.hz .zh{color:var(--pc2-zh)}
+.lc b{font-size:15px}
+.lc span{font-size:12px;font-weight:600;opacity:.8}
+.learn-card h4{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.learn-card .near{border-radius:16px}
 .links .btn{min-height:36px}
 </style>
 </head>
@@ -505,6 +523,7 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 </nav>
 
 <div class="detail" id="detail" hidden></div>
+<div class="detail" id="rd" hidden></div>
 <div class="lb" id="lb" hidden></div>
 <div class="pv" id="pv" hidden></div>
 <button class="show" id="show" hidden data-act="hideShow"></button>
@@ -1065,9 +1084,45 @@ function bkCard(b) {
     </div></article>`;
 }
 
+function hotelCard(hs) {
+  return `<article class="card hotels"><div class="hotels-h"><div class="bk-ico">${BK_ICON.hotel}</div><b>Khách sạn</b><span class="tag">${hs.length}</span></div>
+    ${hs.map((b) => { const dt = parseD(b.date); return `<div class="hotel">
+      <div class="meta">${dt ? `<span>Từ ${DOW[dt.getDay()]} ${ddmm(dt)}</span>` : ""}${b.time ? `<span>· ${esc(b.time)}</span>` : ""}</div>
+      <h3>${esc(b.title)}</h3>
+      ${b.addrZh ? `<div class="zh">${esc(b.addrZh)}</div><div class="actions"><button class="btn small" data-act="copy" data-v="${esc(b.addrZh)}">Sao chép địa chỉ</button><button class="btn small lilac" data-act="showText" data-v="${esc(b.addrZh)}" data-sub="${esc(b.title)}">Đưa tài xế xem</button></div>` : ""}
+      ${b.detail ? prose(b.detail) : ""}</div>`; }).join("")}</article>`;
+}
+function learnCard() {
+  const C = D.info.cities || {};
+  const city = (c) => `<button class="lc ${c}" data-act="readCity" data-v="${c}"><span class="zh">${CITY_ZH[c]}</span><b>${CITIES[c]}</b><span>${C[c] ? "Giới thiệu thành phố ›" : "Sẽ thêm sau"}</span></button>`;
+  const withCul = places().filter((p) => (p.culture || []).length);
+  const group = (c) => {
+    const list = withCul.filter((p) => inCity(p, c));
+    if (!list.length) return "";
+    return `<h4>Địa điểm ở ${CITIES[c]}</h4><div class="near">${list.map((p) => {
+      const titles = p.culture.map((x) => x.title).filter(Boolean);
+      return `<button class="near-row" data-act="learnPlace" data-id="${p.id}" style="grid-template-columns:1fr auto"><span class="near-main"><b>${esc(p.name)}</b><span>${titles.length ? `${titles.length} bài · ${esc(clip(titles.join(" · "), 90))}` : "Văn hoá, lịch sử"}</span></span><span class="near-d"><b>›</b></span></button>`;
+    }).join("")}</div>`;
+  };
+  const arts = group("sh") + group("hz");
+  return `<section class="sec"><div class="sec-h"><h2>Hiểu nơi đây</h2></div><div class="card learn-card">
+    <div class="learn-cities">${city("sh")}${city("hz")}</div>
+    ${arts || '<p class="note">Chưa có bài văn hoá – lịch sử nào. Thêm mục "## Hiểu nơi đây" vào file địa điểm.</p>'}</div></section>`;
+}
+let reader = null;
+function drawReader() {
+  const el = $("#rd");
+  if (!reader) { if (!el.hidden) { el.hidden = true; if (!detailId) document.body.style.overflow = ""; } return; }
+  el.innerHTML = `<div class="d-top"><div class="wrap"><button class="icon-btn" data-act="closeReader" aria-label="Quay lại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button></div></div>
+    <div class="wrap"><div class="d-body"><div class="d-head"><div class="zh">${esc(reader.zh || "")}</div><h2>${esc(reader.title)}</h2></div>
+    ${reader.body ? prose(reader.body) : '<div class="empty"><span>Chưa có nội dung. Viết trong du-lieu/thong-tin.md, mục "## Hiểu nơi đây".</span></div>'}</div></div>`;
+  vnWrap(el);
+  el.hidden = false; el.scrollTop = 0; document.body.style.overflow = "hidden";
+}
 function viewInfo() {
   const I = D.info;
-  const bk = `<section class="sec"><div class="sec-h"><h2>Khách sạn & vé</h2></div>${I.bookings.length ? `<div class="list">${I.bookings.map(bkCard).join("")}</div>` : '<div class="empty"><span>Chưa có. Thêm trong thong-tin.md.</span></div>'}</section>`;
+  const hs = I.bookings.filter((b) => b.kind === "hotel").sort((a, b) => (a.date || "").localeCompare(b.date || "")), others = I.bookings.filter((b) => b.kind !== "hotel");
+  const bk = `<section class="sec"><div class="sec-h"><h2>Khách sạn & vé</h2></div>${I.bookings.length ? `<div class="list">${hs.length ? hotelCard(hs) : ""}${others.map(bkCard).join("")}</div>` : '<div class="empty"><span>Chưa có. Thêm trong thong-tin.md.</span></div>'}</section>`;
   const ck = I.checklist, ckd = ck.filter(ckDone).length;
   const cks = `<section class="sec"><div class="sec-h"><h2>Chuẩn bị trước khi đi</h2><span class="tag">${ckd}/${ck.length}</span></div>
     <div class="ck">${ck.map((c, i) => `<div class="ck-row ${ckDone(c) ? "on" : ""}"><button data-act="toggleCk" data-i="${i}" aria-pressed="${ckDone(c)}"><span class="box">${ICON_CHECK}</span><span class="txt">${esc(c.text)}</span></button></div>`).join("")}</div></section>`;
@@ -1076,7 +1131,7 @@ function viewInfo() {
     <div class="phrases">${PHRASES.map((p, i) => `<button class="phrase" data-act="showPhrase" data-i="${i}"><span class="zh">${p[0]}</span><small>${p[1]}</small><span>${p[2]}</span></button>`).join("")}</div></section>`;
   const sos = `<section class="sec"><div class="sec-h"><h2>Số khẩn cấp ở Trung Quốc</h2></div><div class="sos"><div><b>110</b><span>Cảnh sát</span></div><div><b>120</b><span>Cấp cứu</span></div><div><b>119</b><span>Cứu hoả</span></div></div></section>`;
   const rate = `<section class="sec"><div class="sec-h"><h2>Tỷ giá</h2></div><div class="card"><div class="money"><b>¥100</b><span>≈ ${fmtNum(Math.round(100 * (I.rate || 3650)))} ₫</span></div><span class="meta">1 ¥ = ${fmtNum(I.rate || 3650)} ₫</span></div></section>`;
-  return `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>` + bk + cks + notes + ph + rate + sos;
+  return `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>` + bk + learnCard() + cks + notes + ph + rate + sos;
 }
 
 /* ---------- detail ---------- */
@@ -1231,6 +1286,9 @@ document.addEventListener("click", (e) => {
     case "openPlace": openPlace(id); break;
     case "amap": { const p = PL[id]; if (p) openAmap(p); break; }
     case "closeDetail": closeDetail(); break;
+    case "readCity": { const c = el.dataset.v; reader = { title: CITIES[c], zh: CITY_ZH[c], body: (D.info.cities || {})[c] || "" }; drawReader(); break; }
+    case "closeReader": reader = null; drawReader(); break;
+    case "learnPlace": openPlace(id); detailMode = "learn"; renderDetail(); $("#detail").scrollTop = 0; break;
     case "detailMode": { if (detailMode !== el.dataset.v) { detailMode = el.dataset.v; const box = $("#detail"), m = box.querySelector(".d-mode"), y = m ? m.offsetTop - 70 : 0; renderDetail(); if (box.scrollTop > y) box.scrollTop = Math.max(0, y); } break; }
     case "tocGo": { const t = $("#cul-" + el.dataset.i), box = $("#detail"), top = box.querySelector(".d-top"), m = box.querySelector(".d-mode");
       if (t) box.scrollTop = Math.max(0, t.offsetTop - (top ? top.offsetHeight : 64) - (m ? m.offsetHeight : 0) - 16); break; }
@@ -1296,7 +1354,7 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
-  if (pv) { pv = null; drawPv(); } else if (lb) { lb = null; drawLb(); } else if (!$("#show").hidden) $("#show").hidden = true; else if (detailId) closeDetail();
+  if (pv) { pv = null; drawPv(); } else if (reader) { reader = null; drawReader(); } else if (lb) { lb = null; drawLb(); } else if (!$("#show").hidden) $("#show").hidden = true; else if (detailId) closeDetail();
 });
 function fromHash() {
   const h = location.hash.slice(1);
