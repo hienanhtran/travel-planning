@@ -243,7 +243,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 
 /* bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px}
+.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 4px}
 .nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:11px;font-weight:700;color:var(--ink-soft);min-height:56px}
 .nav button i{display:grid;place-items:center;width:52px;height:30px;border-radius:99px}
 .nav button svg{width:22px;height:22px}
@@ -493,7 +493,6 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
     <button data-tab="home"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a2 2 0 0 1-2 2h-3v-6H9v6H6a2 2 0 0 1-2-2z"/></svg></i>Tổng quan</button>
     <button data-tab="places"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i>Địa điểm</button>
     <button data-tab="plan"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg></i>Lịch trình</button>
-    <button data-tab="poses"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i>Tạo dáng</button>
     <button data-tab="info"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4z"/><path d="M14 5v14" stroke-dasharray="2 2.5"/></svg></i>Thông tin</button>
   </div>
 </nav>
@@ -553,7 +552,7 @@ const isShot = (p, x, i) => !!posedMap[poseKey(p, x, i)];
 let ckMap = LS.get("ck", {});
 const isDone = (id) => !!doneMap[id];
 const ckDone = (c) => (c.text in ckMap ? ckMap[c.text] : c.done);
-const saveUi = () => LS.set("ui", { city: ui.city, cat: ui.cat, hideDone: ui.hideDone, view: ui.view });
+const saveUi = () => LS.set("ui", { cat: ui.cat, hideDone: ui.hideDone, view: ui.view });
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -595,12 +594,12 @@ function dayCity(i) { return [...new Set(planItems().filter((p) => p.day === i).
 const byTime = (a, b) => (a.time || "99").localeCompare(b.time || "99");
 
 /* ---------- render ---------- */
-const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", poses: "Ảnh tạo dáng", info: "Thông tin chuyến đi" };
+const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", info: "Thông tin chuyến đi" };
 function render() {
   document.querySelectorAll(".nav button").forEach((b) => { if (b.dataset.tab === ui.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   $("#pageTitle span").textContent = TITLES[ui.tab];
   if (!D) return;
-  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, poses: viewPoses, info: viewInfo })[ui.tab]();
+  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, info: viewInfo })[ui.tab]();
   vnWrap($("#view"));
   if (onMap()) attachMap(); else stopGeo();
   renderDetail();
@@ -1153,29 +1152,6 @@ function poseSection(p) {
   return `<section class="d-sec"><div class="sec-h"><h3>Tạo dáng</h3><span class="tag">${shot}/${ps.length} đã chụp</span></div>
     <div class="pose-grid">${ps.map((x, i) => poseTile(p, x, i)).join("")}</div></section>`;
 }
-function viewPoses() {
-  const withPoses = places().filter((p) => (p.poses || []).length);
-  const inCity = (c) => withPoses.filter((p) => c === "all" || p.city === c || p.city === "both");
-  const count = (list) => list.reduce((s, p) => s + p.poses.length, 0);
-  const seg = `<div class="seg" role="group" aria-label="Thành phố">${["all", "sh", "hz"].map((c) => `<button data-act="city" data-v="${c}" aria-pressed="${ui.city === c}">${c === "all" ? "Tất cả" : CITIES[c]} ${count(inCity(c))}</button>`).join("")}</div>`;
-  if (!withPoses.length) {
-    return `<div class="empty"><b>Chưa có ảnh tạo dáng nào</b><span>Thêm mục "## Tạo dáng" vào file địa điểm, hoặc bỏ ảnh vào thư mục anh/ten-dia-diem/tao-dang/, rồi đồng bộ.</span></div>`;
-  }
-  const list = inCity(ui.city).sort((a, b) => (b.must ? 1 : 0) - (a.must ? 1 : 0) || a.name.localeCompare(b.name, "vi"));
-  let total = 0, shot = 0;
-  const groups = list.map((p) => {
-    const items = p.poses.map((x, i) => ({ x, i, s: isShot(p, x, i) }));
-    total += items.length; shot += items.filter((t) => t.s).length;
-    const shown = ui.hideShot ? items.filter((t) => !t.s) : items;
-    if (!shown.length) return "";
-    return `<section class="pg"><div class="pg-head"><div style="min-width:0"><h2>${esc(p.name)}</h2>${p.zh ? `<div class="zh">${esc(p.zh)}</div>` : ""}</div>
-      <button class="link" data-act="openPlace" data-id="${p.id}" style="flex:none">Địa điểm ›</button></div>
-      <div class="pose-strip">${shown.map((t) => poseTile(p, t.x, t.i)).join("")}</div>
-      <div class="meta">${items.filter((t) => t.s).length}/${items.length} dáng đã chụp${p.city ? ` · ${CITIES[p.city]}` : ""}</div></section>`;
-  }).join("");
-  const tog = `<div class="toggle-row"><span>${shot}/${total} dáng đã chụp</span><button class="switch" data-act="hideShot" aria-pressed="${!!ui.hideShot}"><i></i>Ẩn dáng đã chụp</button></div>`;
-  return seg + tog + (groups || '<div class="empty"><span>Không còn dáng nào ở đây. Tắt "Ẩn dáng đã chụp" để xem lại.</span></div>');
-}
 let pv = null;
 function openPose(pid, i) { pv = { pid, i, j: 0 }; drawPv(); }
 function drawPv() {
@@ -1232,7 +1208,6 @@ document.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act, id = el.dataset.id;
   switch (a) {
-    case "city": ui.city = el.dataset.v; saveUi(); render(); break;
     case "cat": ui.cat = el.dataset.v; saveUi(); render(); break;
     case "hideDone": ui.hideDone = !ui.hideDone; saveUi(); render(); break;
     case "togglePlace": { const p = PL[id]; if (!p) break; doneMap = { ...doneMap, [id]: !isDone(id) }; LS.set("done", doneMap); render(); if (isDone(id)) toast("Đã ghé: " + p.name); break; }
@@ -1259,7 +1234,6 @@ document.addEventListener("click", (e) => {
       if (posedMap[k]) toast("Đã chụp dáng này");
       break;
     }
-    case "hideShot": ui.hideShot = !ui.hideShot; render(); break;
     case "view": ui.view = el.dataset.v; saveUi(); render(); window.scrollTo(0, 0); break;
     case "mapSel": if (id) selectOnMap(id); else { ui.mapSel = null; render(); } break;
     case "locate": centerOnFix = true; geoErr = ""; if (me && MAP) { centerOnFix = false; MAP.setView([me.lat, me.lng], 16, { animate: false }); } stopGeo(); startGeo(); if (!me) toast("Đang tìm vị trí của bạn…"); break;
