@@ -434,6 +434,48 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 .offline .bar{margin-top:0}
 .offline .note{font-size:13px}
 .ck-row > button:first-child{padding-right:14px}
+
+/* places: city cards (overview), city bar, routes */
+.city-card{display:flex;flex-direction:column;gap:14px;padding:26px 22px 22px}
+.city-card .hero-zh{font-size:clamp(44px,14vw,64px)}
+.city-card .hero-title{margin:0}
+.cc-sum{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.cc-sum b{font-family:var(--f-display);font-weight:800;font-size:46px;line-height:.85;color:var(--hero-num)}
+.cc-sum span{font-weight:600;font-size:14px;padding-bottom:2px}
+.cc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.cc-cell{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border:0;border-radius:12px;padding:8px 11px;background:rgba(255,255,255,.14);color:inherit;text-align:left;min-height:42px}
+.cc-cell span{font-size:13px;font-weight:600;min-width:0}
+.cc-cell b{font-family:var(--f-display);font-weight:800;font-size:19px;font-variant-numeric:tabular-nums}
+.cc-cell b small{font-family:var(--f-body);font-size:11px;font-weight:600;opacity:.8}
+.cc-lines{display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:600}
+.cc-lines span::before{content:"· ";opacity:.7}
+.cc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cc-btns .btn{margin:0;background:var(--hero-num);color:var(--hero-num-ink)}
+.cc-btns .btn.ghost{background:transparent;border:1.5px solid var(--hero-ink);color:var(--hero-ink)}
+.city-bar{display:flex;align-items:center;gap:10px}
+.city-bar .grow{flex:1;min-width:0}
+.city-bar b{display:block;font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.1}
+.city-bar small{font-size:12px;font-weight:600;color:var(--ink-soft)}
+.city-bar .icon-btn svg{width:20px;height:20px}
+.lbl-row{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:-10px}
+.chip.route[aria-pressed="true"]{background:var(--lilac-deep);border-color:var(--lilac-deep);color:#fff}
+.chip small{font-weight:700;opacity:.7;margin-left:4px}
+.route-head{display:flex;flex-direction:column;gap:8px}
+.route-head h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.2}
+.route-head .pc-img{aspect-ratio:4/3}
+.stop{position:relative}
+.stepno{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#7B4CCF;color:#fff;font-family:var(--f-display);font-weight:800;font-size:15px}
+.stop .stepno{position:absolute;left:-4px;top:-8px;z-index:2;width:34px;height:34px;border:3px solid var(--bg)}
+.leg{display:flex;align-items:center;gap:8px;margin:-2px 0 -2px 18px;padding:2px 0 2px 16px;border-left:3px dotted var(--lilac);font-size:13px;font-weight:700;color:var(--lilac-deep);min-height:30px}
+.saved{border-color:var(--lilac);background:var(--lilac-soft)}
+.saved .chips{margin-top:2px}
+.pin.num{background:#7B4CCF;color:#fff;font:800 15px var(--f-display)}
+.pin.num.done{background:#A99BC2}
+.pin.faded{opacity:.4;box-shadow:none;transform:scale(.8)}
+.inside{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
+.inside .near-row{grid-template-columns:1fr auto}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links .btn{min-height:36px}
 </style>
 </head>
 <body>
@@ -466,7 +508,8 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 (() => {
 const CITIES = { sh: "Thượng Hải", hz: "Hàng Châu", both: "Thượng Hải & Hàng Châu" };
 const CITY_CODE = { sh: "310000", hz: "330100" };
-const CATS = { see: "Tham quan", eat: "Ăn uống", cafe: "Cà phê & trà", shop: "Mua sắm", photo: "Chụp ảnh", other: "Khác" };
+const CATS = { eat: "Ăn uống", cafe: "Cà phê & trà", shop: "Mua sắm", see: "Tham quan", photo: "Chụp ảnh", combo: "Tổ hợp", other: "Khác" };
+const OTHER_CITY = { sh: "hz", hz: "sh" };
 const BK = { flight: "Chuyến bay", hotel: "Khách sạn", train: "Tàu cao tốc", other: "Khác" };
 const STATUS = { idea: "Ý tưởng – chưa tìm hiểu", check: "Đã nghiên cứu – cần kiểm tra lại", ok: "Đã xác nhận" };
 const PHRASES = [
@@ -488,7 +531,12 @@ const BK_ICON = {
 };
 
 let D = null; // data.json
-const PL = {}; // places by id
+const PL = {}; // places by id (also the small route stops that have no file of their own)
+const RT = {}; // routes by id
+const routes = () => (D ? D.routes || [] : []);
+const inCity = (p, c) => p.city === c || p.city === "both";
+const routeStops = (r) => r.stops.map((s) => ({ ...s, p: PL[s.id] })).filter((s) => s.p);
+const WALK = 1.25; // straight line → rough walking distance
 const ui = { tab: "home", city: "all", cat: "all", hideDone: false, day: null };
 const off = { total: 0, done: 0, running: false, error: false, sw: "serviceWorker" in navigator };
 
@@ -554,7 +602,7 @@ function render() {
   if (!D) return;
   $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, poses: viewPoses, info: viewInfo })[ui.tab]();
   vnWrap($("#view"));
-  if (ui.tab === "places" && ui.view === "map") attachMap(); else stopGeo();
+  if (onMap()) attachMap(); else stopGeo();
   renderDetail();
 }
 
@@ -588,7 +636,8 @@ function vnGlue(s) {
 function vnWrap(root) {
   if (!root) return;
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-    acceptNode: (n) => (n.parentElement && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentElement.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    // Chinese names (.zh, .pc-zh) are not Vietnamese: gluing their Latin words makes long unbreakable runs
+    acceptNode: (n) => (n.parentElement && (/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentElement.tagName) || n.parentElement.closest(".pc-zh,.zh")) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
   });
   const nodes = [];
   while (walk.nextNode()) nodes.push(walk.currentNode);
@@ -632,9 +681,12 @@ function viewHome() {
   return hero + offlineCard() + stats + next + mustSec;
 }
 
-function placeCard(p) {
+function placeCard(p, o = {}) {
   const done = isDone(p.id);
-  return `<article class="pcard stamp ${p.city === "hz" ? "alt" : ""} ${done ? "done" : ""}">
+  const pc = p.city === "both" ? (ui.pcity === "hz" ? "hz" : ui.pcity === "sh" ? "sh" : "") : p.city;
+  const chain = p.city === "both" ? `<span class="pill">${ui.pcity ? "Có cả ở " + CITIES[OTHER_CITY[ui.pcity]] : "Có ở cả 2 thành phố"}</span>` : "";
+  const inside = (p.inside || []).length ? `<span class="pill">${p.inside.length} chỗ bên trong</span>` : "";
+  return `<article class="pcard stamp ${pc === "hz" ? "alt" : ""} ${done ? "done" : ""}">
     <div class="card-top">
       <button class="card-main" data-act="openPlace" data-id="${p.id}" style="color:inherit">
         ${p.zh ? `<div class="pc-zh">${esc(p.zh)}</div>` : ""}
@@ -643,10 +695,11 @@ function placeCard(p) {
       ${done ? '<span class="pm">ĐÃ GHÉ</span>' : ""}
       <button class="check" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}" aria-label="Đánh dấu đã đi">${ICON_CHECK}</button>
     </div>
-    <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
+    <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${chain}${inside}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
     ${p.photos.length ? `<button class="card-main" data-act="openPlace" data-id="${p.id}" aria-label="Xem ${esc(p.name)}"><img class="pc-img" src="${p.photos[0]}" alt="" loading="lazy"></button>` : ""}
-    ${p.note ? `<p class="note">${esc(clip(p.note.split("\n")[0], 140))}</p>` : ""}
+    ${o.stopNote ? `<p class="note"><b>Ở cung này:</b> ${esc(o.stopNote)}</p>` : ""}
+    ${p.note && !(o.stopNote && p.stopOf) ? `<p class="note">${esc(clip(p.note.split("\n")[0], 140))}</p>` : ""}
     <div class="actions">
       <button class="btn small lilac" data-act="openPlace" data-id="${p.id}">Xem chi tiết</button>
       ${p.zh || p.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}
@@ -685,7 +738,7 @@ const fmtDist = (m) => (m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000
 const walkTxt = (m) => (m <= 3000 ? `${Math.max(1, Math.round(m / 80))} phút đi bộ` : "nên đi metro hoặc Didi");
 const ARROW = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2l6 18-6-4-6 4z"/></svg>';
 
-let MAP = null, mapEl = null, markers = null, meMarker = null, meCircle = null, lastFit = "";
+let MAP = null, mapEl = null, markers = null, routeLayer = null, meMarker = null, meCircle = null, lastFit = "";
 let me = null, geoWatch = null, geoErr = "", centerOnFix = false;
 const hotels = () => (D ? D.info.bookings.map((b, i) => ({ ...b, id: "hotel-" + i })).filter((b) => b.kind === "hotel" && b.loc) : []);
 
@@ -704,7 +757,18 @@ function viewMap(ps) {
       <div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${sel.id}">Xem chi tiết</button>${sel.zh || sel.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${sel.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${sel.id}">Mở Amap</button></div></div>`;
   }
   let near = "";
-  if (me) {
+  const r = ui.route && RT[ui.route];
+  if (r) {
+    const st = routeStops(r);
+    near = `<section class="sec"><div class="sec-h"><h2>Các điểm trên cung</h2><span class="meta">${st.length} điểm</span></div>
+      <div class="near">${st.map((s, i) => {
+        const d = me && s.p.loc ? distM([me.lat, me.lng], s.p.loc) : null;
+        return `<button class="near-row" data-act="${s.p.loc ? "mapSel" : "openPlace"}" data-id="${s.p.id}">
+        <span class="stepno" ${isDone(s.p.id) ? 'style="background:#A99BC2"' : ""}>${isDone(s.p.id) ? "✓" : i + 1}</span>
+        <span class="near-main"><b>${esc(s.p.name)}</b><span>${s.p.zh ? esc(s.p.zh) : ""}${!s.p.loc ? " · chưa có vị trí" : ""}</span></span>
+        <span class="near-d">${d != null ? `<b>${fmtDist(d)}</b><span>${walkTxt(d)}</span>` : ""}</span></button>`;
+      }).join("")}</div></section>`;
+  } else if (me) {
     const rows = withLoc.map((p) => ({ p, d: distM([me.lat, me.lng], p.loc), b: bearing([me.lat, me.lng], p.loc) })).sort((a, b) => a.d - b.d).slice(0, 10);
     near = `<section class="sec"><div class="sec-h"><h2>Gần bạn nhất</h2><span class="meta">±${Math.round(me.acc)} m</span></div>
       ${rows.length && rows[0].d > 50000 ? `<p class="note">Bạn đang cách các địa điểm ${fmtDist(rows[0].d)}. Danh sách sẽ có ích khi bạn tới Thượng Hải hoặc Hàng Châu.</p>` : ""}
@@ -712,7 +776,8 @@ function viewMap(ps) {
         <span class="near-dir" style="transform:rotate(${Math.round(r.b)}deg)">${ARROW}</span>
         <span class="near-main"><b>${esc(r.p.name)}</b><span>${r.p.zh ? esc(r.p.zh) + " · " : ""}${DIRS[Math.round(r.b / 45) % 8]}${r.p.locSrc === "gan-dung" ? " · gần đúng" : ""}</span></span>
         <span class="near-d"><b>${fmtDist(r.d)}</b><span>${walkTxt(r.d)}</span></span></button>`).join("")}</div></section>`;
-  } else {
+  }
+  if (!me && !r) {
     near = `<div class="card near-empty"><b>Gần bạn nhất</b><span class="note">${geoErr || "Bật định vị để xem địa điểm nào gần bạn. Định vị dùng GPS nên vẫn chạy khi không có mạng."}</span><div class="actions"><button class="btn small" data-act="locate">Bật định vị</button></div></div>`;
   }
   const miss = noLoc.length ? `<details class="card miss"><summary>${noLoc.length} địa điểm chưa có vị trí trên bản đồ</summary>
@@ -721,12 +786,14 @@ function viewMap(ps) {
   return `<div id="mapSlot" class="map-wrap"></div>${card}${near}${tilesCard()}${miss}`;
 }
 
-function pinIcon(p) {
+function pinIcon(p, o = {}) {
   const done = isDone(p.id), sel = ui.mapSel === p.id;
-  const cls = ["pin", p.city === "hz" ? "hz" : p.city === "both" ? "both" : "", done ? "done" : "", p.must ? "must" : "", p.locSrc === "gan-dung" ? "approx" : "", sel ? "sel" : ""].join(" ");
-  const ch = esc((p.zh || p.name).replace(/^[\s(（]+/, "").slice(0, 1));
+  const cls = ["pin", o.num ? "num" : p.city === "hz" ? "hz" : p.city === "both" ? "both" : "", done ? "done" : "", p.must && !o.faded ? "must" : "",
+    p.locSrc === "gan-dung" ? "approx" : "", sel ? "sel" : "", o.faded && !sel ? "faded" : ""].join(" ");
+  const ch = o.num ? o.num : esc((p.zh || p.name).replace(/^[\s(（]+/, "").slice(0, 1));
   return L.divIcon({ className: "", html: `<div class="${cls}">${done ? "✓" : ch}</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
 }
+const onMap = () => ui.tab === "places" && !!ui.pcity && ui.view === "map";
 function attachMap() {
   const slot = $("#mapSlot");
   if (!slot) return;
@@ -740,6 +807,7 @@ function attachMap() {
     MAP = L.map(mapEl.querySelector(".map"), { zoomControl: false, tap: false }).setView([31.23, 121.47], 12);
     L.tileLayer(TILE, { subdomains: "1234", maxZoom: 18, attribution: "© 高德地图 Amap" }).addTo(MAP);
     MAP.attributionControl.setPrefix(false);
+    routeLayer = L.layerGroup().addTo(MAP);
     markers = L.layerGroup().addTo(MAP);
     MAP.on("click", () => { if (ui.mapSel) { ui.mapSel = null; render(); } });
   }
@@ -750,25 +818,42 @@ function attachMap() {
 }
 const CITY_BOX = { sh: [30.85, 31.5, 121.0, 121.95], hz: [30.0, 30.5, 119.65, 120.45] };
 const inCityBox = (c, loc) => { const b = CITY_BOX[c]; return !b || (loc[0] >= b[0] && loc[0] <= b[1] && loc[1] >= b[2] && loc[1] <= b[3]); };
+const cityPlaces = (c) => places().filter((p) => inCity(p, c));
+const cityRoutes = (c) => routes().filter((r) => r.city === c);
 function mapList() {
-  return places().filter((p) => p.loc && (ui.city === "all" || ((p.city === ui.city || p.city === "both") && inCityBox(ui.city, p.loc)))
-    && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)));
+  const r = ui.route && RT[ui.route];
+  if (r) return routeStops(r).map((s) => s.p).filter((p) => p.loc);
+  return cityPlaces(ui.pcity).filter((p) => p.loc && inCityBox(ui.pcity, p.loc) && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)));
 }
+const cityHotels = () => hotels().filter((h) => h.addrZh.includes(CITY_ZH[ui.pcity]));
 function drawMarkers() {
   markers.clearLayers();
-  const list = mapList();
-  for (const p of list) L.marker(p.loc, { icon: pinIcon(p), zIndexOffset: ui.mapSel === p.id ? 1000 : p.must ? 100 : 0 }).on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(p.id); }).addTo(markers);
-  for (const h of hotels()) {
-    if (ui.city !== "all" && !h.addrZh.includes(CITY_ZH[ui.city])) continue;
+  routeLayer.clearLayers();
+  const list = mapList(), r = ui.route && RT[ui.route];
+  const pin = (p, o) => L.marker(p.loc, { icon: pinIcon(p, o), zIndexOffset: ui.mapSel === p.id ? 1000 : o.num ? 600 : p.must && !o.faded ? 100 : 0 })
+    .on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(p.id); }).addTo(markers);
+  if (r) {
+    // the route: other places of the city stay as faint dots, the stops are numbered and joined by a line
+    const ids = new Set(list.map((p) => p.id));
+    for (const p of cityPlaces(ui.pcity)) if (p.loc && !ids.has(p.id) && inCityBox(ui.pcity, p.loc)) pin(p, { faded: true });
+    const st = routeStops(r);
+    st.forEach((s, i) => { if (s.p.loc) pin(s.p, { num: i + 1 }); });
+    const line = st.filter((s) => s.p.loc).map((s) => s.p.loc);
+    if (line.length > 1) {
+      L.polyline(line, { color: "#ffffff", weight: 9, opacity: 0.9, interactive: false }).addTo(routeLayer);
+      L.polyline(line, { color: "#7B4CCF", weight: 5, opacity: 0.95, interactive: false }).addTo(routeLayer);
+    }
+  } else for (const p of list) pin(p, {});
+  for (const h of cityHotels()) {
     L.marker(h.loc, { icon: L.divIcon({ className: "", html: `<div class="pin hotel ${ui.mapSel === h.id ? "sel" : ""}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="2"/></svg></div>`, iconSize: [32, 32], iconAnchor: [16, 16] }), zIndexOffset: 500 })
       .on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(h.id); }).addTo(markers);
   }
-  const key = ui.city + "|" + ui.cat + "|" + ui.hideDone;
+  const key = ui.pcity + "|" + ui.cat + "|" + ui.hideDone + "|" + (ui.route || "");
   if (key !== lastFit) { lastFit = key; fitTo(list); }
   drawMe();
 }
 function fitTo(list) {
-  const pts = list.map((p) => p.loc).concat(hotels().filter((h) => ui.city === "all" || h.addrZh.includes(CITY_ZH[ui.city])).map((h) => h.loc));
+  const pts = list.map((p) => p.loc).concat(ui.route ? [] : cityHotels().map((h) => h.loc));
   if (!pts.length) return;
   if (pts.length === 1) MAP.setView(pts[0], 15, { animate: false }); else MAP.fitBounds(pts, { padding: [28, 28], maxZoom: 15, animate: false });
 }
@@ -800,7 +885,7 @@ function startGeo() {
     geoErr = err.code === 1 ? "Chưa cho phép định vị. Vào Cài đặt › Quyền riêng tư & Bảo mật › Dịch vụ định vị, bật cho Safari (hoặc Trang web Safari), rồi mở lại app."
       : "Chưa lấy được vị trí. Ra chỗ thoáng hoặc thử lại sau ít giây.";
     stopGeo();
-    if (ui.tab === "places" && ui.view === "map") render();
+    if (onMap()) render();
   }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
 }
 function stopGeo() { if (geoWatch !== null) { navigator.geolocation.clearWatch(geoWatch); geoWatch = null; } }
@@ -812,7 +897,7 @@ function tileList() {
     const n = 2 ** z, r = (lat * Math.PI) / 180;
     return [Math.floor(((lng + 180) / 360) * n), Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n)];
   };
-  const pts = places().filter((p) => p.loc).map((p) => p.loc).concat(hotels().map((h) => h.loc));
+  const pts = places().concat(D.stops || []).filter((p) => p.loc).map((p) => p.loc).concat(hotels().map((h) => h.loc));
   for (const [lat, lng] of pts) {
     for (const [z, rad] of [[12, 0], [13, 0], [14, 1], [15, 1], [16, 1]]) {
       const [x, y] = t(lat, lng, z);
@@ -847,7 +932,7 @@ async function saveTiles() {
         if (!(await c.match(u))) { const r = await fetch(u, { mode: "cors" }); if (r.ok) await c.put(u, r); else tiles.err++; }
         tiles.done++;
       } catch (e) { tiles.err++; tiles.done++; }
-      if (Date.now() - last > 500) { last = Date.now(); if (ui.view === "map" && ui.tab === "places") render(); }
+      if (Date.now() - last > 500) { last = Date.now(); if (onMap()) render(); }
     }
   };
   await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
@@ -857,18 +942,81 @@ async function saveTiles() {
   render();
 }
 
+/* chains that exist in both cities and have not been ticked yet */
+const savedChains = () => places().filter((p) => p.city === "both" && !isDone(p.id));
+function cityDays(c) {
+  const days = [...new Set(planItems().filter((i) => i.city === c).map((i) => i.day))].sort((a, b) => a - b);
+  if (!days.length) return "";
+  const a = dayDate(days[0]), b = dayDate(days[days.length - 1]);
+  const lbl = days.length === 1 ? `Ngày ${days[0]}` : `Ngày ${days[0]}–${days[days.length - 1]}`;
+  return a ? `${lbl} · ${ddmm(a)}${b && days.length > 1 ? " – " + ddmm(b) : ""}` : lbl;
+}
+function cityCard(c) {
+  const ps = cityPlaces(c), done = ps.filter((p) => isDone(p.id)).length;
+  const cells = Object.keys(CATS).map((k) => {
+    const list = ps.filter((p) => p.cat === k);
+    if (!list.length) return "";
+    const d = list.filter((p) => isDone(p.id)).length;
+    return `<button class="cc-cell" data-act="cityGo" data-c="${c}" data-cat="${k}"><span>${CATS[k]}</span><b>${list.length}${d ? `<small> · ${d}✓</small>` : ""}</b></button>`;
+  }).join("");
+  const must = ps.filter((p) => p.must && !isDone(p.id)).length, nr = cityRoutes(c).length, chains = ps.filter((p) => p.city === "both").length;
+  const lines = [
+    must && `Phải đi mà chưa ghé: ${must}`,
+    nr && `${nr} cung đường`,
+    c === "hz" && savedChains().length ? `Để dành từ Thượng Hải: ${savedChains().length} chuỗi chưa thử` : chains && `${chains} chuỗi có cả ở ${CITIES[OTHER_CITY[c]]}`,
+  ].filter(Boolean);
+  return `<section class="hero stamp city-card ${c === "hz" ? "alt" : ""}">
+    <div><div class="hero-zh">${CITY_ZH[c]}</div><div class="hero-title">${CITIES[c]}</div>${cityDays(c) ? `<div class="hero-dates">${cityDays(c)}</div>` : ""}</div>
+    <div class="cc-sum"><b>${ps.length}</b><span>địa điểm${done ? ` · ${done} đã ghé` : ""}</span></div>
+    <div class="cc-grid">${cells}</div>
+    ${lines.length ? `<div class="cc-lines">${lines.map((l) => `<span>${l}</span>`).join("")}</div>` : ""}
+    <div class="cc-btns"><button class="btn" data-act="cityGo" data-c="${c}" data-view="list">Địa điểm</button><button class="btn ghost" data-act="cityGo" data-c="${c}" data-view="map">Bản đồ</button></div>
+  </section>`;
+}
 function viewPlaces() {
-  const all = places();
-  const ps = all.filter((p) => (ui.city === "all" || p.city === ui.city || p.city === "both") && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
+  if (!ui.pcity) return cityCard("sh") + cityCard("hz");
+  const c = ui.pcity, all = cityPlaces(c), rs = cityRoutes(c);
+  if (ui.route && !rs.some((r) => r.id === ui.route)) ui.route = "";
+  const r = ui.route && RT[ui.route];
+  const bar = `<div class="city-bar"><button class="icon-btn" data-act="cityBack" aria-label="Chọn thành phố khác"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="grow"><b>${CITIES[c]}</b><small>${all.length} địa điểm${rs.length ? ` · ${rs.length} cung đường` : ""}</small></div>
+    <button class="btn small ghost" data-act="cityGo" data-c="${OTHER_CITY[c]}">${CITIES[OTHER_CITY[c]]} ›</button></div>`;
+  const vt = `<div class="seg seg2" role="group" aria-label="Cách xem"><button data-act="view" data-v="list" aria-pressed="${ui.view !== "map"}">Địa điểm</button><button data-act="view" data-v="map" aria-pressed="${ui.view === "map"}">Bản đồ</button></div>`;
+  const rchips = rs.length ? `<div class="lbl-row">Cung đường</div><div class="chips" role="group" aria-label="Cung đường">
+    <button class="chip route" data-act="route" data-v="" aria-pressed="${!r}">Không chọn</button>
+    ${rs.map((x) => `<button class="chip route" data-act="route" data-v="${x.id}" aria-pressed="${ui.route === x.id}">${esc(x.name)}<small>${x.stops.length}</small></button>`).join("")}</div>` : "";
+  if (r) return bar + vt + rchips + (ui.view === "map" ? viewMap(routeStops(r).map((s) => s.p)) : routeList(r));
+  const ps = all.filter((p) => (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
     .sort((a, b) => (isDone(a.id) ? 1 : 0) - (isDone(b.id) ? 1 : 0) || (b.must ? 1 : 0) - (a.must ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0));
-  const cnt = (c) => all.filter((p) => c === "all" || p.city === c || p.city === "both").length;
-  const seg = `<div class="seg" role="group" aria-label="Thành phố">${["all", "sh", "hz"].map((c) => `<button data-act="city" data-v="${c}" aria-pressed="${ui.city === c}">${c === "all" ? "Tất cả" : CITIES[c]} ${cnt(c)}</button>`).join("")}</div>`;
-  const chips = `<div class="chips" role="group" aria-label="Loại">${[["all", "Mọi loại"], ...Object.entries(CATS)].map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}</button>`).join("")}</div>`;
+  const n = (k) => all.filter((p) => k === "all" || p.cat === k).length;
+  const chips = `<div class="lbl-row">Loại</div><div class="chips" role="group" aria-label="Loại">${[["all", "Mọi loại"], ...Object.entries(CATS)].filter(([k]) => n(k)).map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}<small>${n(k)}</small></button>`).join("")}</div>`;
   const tog = `<div class="toggle-row"><span>${ps.length} địa điểm</span><button class="switch" data-act="hideDone" aria-pressed="${ui.hideDone}"><i></i>Ẩn chỗ đã đi</button></div>`;
-  const vt = `<div class="seg seg2" role="group" aria-label="Cách xem"><button data-act="view" data-v="list" aria-pressed="${ui.view !== "map"}">Danh sách</button><button data-act="view" data-v="map" aria-pressed="${ui.view === "map"}">Bản đồ</button></div>`;
-  if (ui.view === "map") return vt + seg + chips + tog + viewMap(ps);
-  const body = ps.length ? `<div class="list">${ps.map(placeCard).join("")}</div>` : '<div class="empty"><b>Không có địa điểm nào khớp bộ lọc</b><span>Thử chọn "Tất cả" hoặc "Mọi loại".</span></div>';
-  return vt + seg + chips + tog + body;
+  if (ui.view === "map") return bar + vt + rchips + chips + tog + viewMap(ps);
+  const sc = savedChains().filter((p) => ui.cat === "all" || p.cat === ui.cat);
+  const saved = c === "hz" && sc.length ? `<div class="card saved"><b>Chưa kịp thử ở Thượng Hải?</b><span class="note">Các chuỗi này có cả ở Hàng Châu, bạn chưa đánh dấu đã ghé:</span>
+    <div class="chips">${sc.map((p) => `<button class="chip" data-act="openPlace" data-id="${p.id}">${esc(p.name)}</button>`).join("")}</div></div>` : "";
+  const body = ps.length ? `<div class="list">${ps.map((p) => placeCard(p)).join("")}</div>` : '<div class="empty"><b>Không có địa điểm nào khớp bộ lọc</b><span>Thử chọn "Mọi loại" hoặc tắt "Ẩn chỗ đã đi".</span></div>';
+  return bar + vt + rchips + chips + tog + saved + body;
+}
+function legTxt(a, b) {
+  if (!a.loc || !b.loc) return "";
+  const m = distM(a.loc, b.loc) * WALK;
+  return `~${fmtDist(m)} · ${m > 3000 ? "nên đi metro hoặc Didi" : Math.max(1, Math.round(m / 80)) + " phút đi bộ"}`;
+}
+function routeList(r) {
+  const st = routeStops(r);
+  let total = 0;
+  for (let i = 1; i < st.length; i++) if (st[i - 1].p.loc && st[i].p.loc) total += distM(st[i - 1].p.loc, st[i].p.loc) * WALK;
+  const done = st.filter((s) => isDone(s.p.id)).length;
+  const meta = [`${st.length} điểm dừng`, total && `~${fmtDist(total)} đi bộ`, r.duration, r.bestTime && `Nên đi: ${r.bestTime}`, done && `${done} đã ghé`].filter(Boolean);
+  const head = `<div class="card route-head"><h3>${esc(r.name)}</h3><div class="meta">${meta.map((m) => `<span>${esc(m)}</span>`).join("<span>·</span>")}</div>
+    ${r.photos.length ? `<button class="card-main" data-act="routePhoto" data-id="${r.id}" aria-label="Xem ảnh cung đường"><img class="pc-img" src="${r.photos[0]}" alt="" loading="lazy"></button>` : ""}
+    ${r.note ? prose(r.note) : ""}${r.sections.map((s) => `<b>${esc(s.title)}</b>${prose(s.body)}`).join("")}
+    <div class="actions"><button class="btn small" data-act="view" data-v="map">Xem trên bản đồ</button></div>
+    <span class="src">Khoảng cách đi bộ là ước tính theo đường thẳng.</span></div>`;
+  const items = st.map((s, i) => (i ? (legTxt(st[i - 1].p, s.p) ? `<div class="leg">↓ ${legTxt(st[i - 1].p, s.p)}</div>` : `<div class="leg">↓</div>`) : "")
+    + `<div class="stop"><span class="stepno">${i + 1}</span>${placeCard(s.p, { stopNote: s.note })}</div>`).join("");
+  return head + `<div class="list">${items}</div>`;
 }
 
 function tlItem(p) {
@@ -882,6 +1030,7 @@ function tlItem(p) {
       ${p.city || p.move ? `<div class="meta">${p.city ? `<span class="tag city-${p.city}">${CITIES[p.city]}</span>` : ""}${p.move ? `<span>${esc(p.move)}</span>` : ""}</div>` : ""}
       ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
       ${place ? `<div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${place.id}">Chi tiết</button>${place.zh || place.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${place.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${place.id}">Mở Amap</button></div>` : ""}
+      ${p.route && RT[p.route] ? `<div class="actions"><button class="btn small lilac" data-act="goRoute" data-id="${p.route}">Xem cung đường (${RT[p.route].stops.length} điểm)</button></div>` : ""}
     </div>
   </div>`;
 }
@@ -960,6 +1109,13 @@ function renderDetail() {
     ${p.addrVi ? `<div class="en">${esc(p.addrVi)}</div>` : !p.addrZh ? `<div class="en">${esc(p.area || "Chưa có địa chỉ.")}</div>` : ""}
     <div class="actions">${p.addrZh ? `<button class="btn small" data-act="copy" data-v="${esc(p.addrZh)}">Sao chép địa chỉ</button>` : ""}${p.zh || p.addrZh ? `<button class="btn small lilac" data-act="showPlace" data-id="${p.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${p.id}">Mở app Amap</button>${p.loc ? `<button class="btn small ghost" data-act="showOnMap" data-id="${p.id}">Xem trên bản đồ</button>` : ""}<a class="btn small ghost" href="${appleMapUrl(p)}">Bản đồ Apple</a></div></div></section>`;
   const when = p.bestTime || p.bestNote ? `<section class="d-sec"><div class="sec-h"><h3>Nên đi lúc nào?</h3></div><div class="card when"><span class="lbl">Khung giờ nên đến</span>${p.bestTime ? `<div class="t">${esc(p.bestTime)}</div>` : ""}${p.bestNote ? prose(p.bestNote) : ""}</div></section>` : "";
+  const ins = (p.inside || []).map((it) => ({ ...it, q: it.id && PL[it.id] }));
+  const insideSec = ins.length ? `<section class="d-sec"><div class="sec-h"><h3>Trong khu này</h3><span class="tag">${ins.length} chỗ</span></div><div class="inside">${ins.map((it) => it.q
+    ? `<button class="near-row" data-act="openPlace" data-id="${it.q.id}"><span class="near-main"><b>${esc(it.q.name)}</b><span>${[it.q.zh, CATS[it.q.cat], it.note].filter(Boolean).map(esc).join(" · ")}</span></span><span class="near-d"><b>›</b></span></button>`
+    : `<div class="near-row"><span class="near-main"><b>${esc(it.name || it.id)}</b><span>${[it.kind, it.note].filter(Boolean).map(esc).join(" · ")}</span></span><span></span></div>`).join("")}</div></section>` : "";
+  const parents = places().filter((x) => (x.inside || []).some((it) => it.id === p.id));
+  const inRoutes = routes().filter((r) => r.stops.some((s) => s.id === p.id));
+  const rel = parents.length || inRoutes.length ? `<div class="links">${parents.map((x) => `<button class="btn small ghost" data-act="openPlace" data-id="${x.id}">Nằm trong: ${esc(x.name)} ›</button>`).join("")}${inRoutes.map((r) => `<button class="btn small ghost" data-act="goRoute" data-id="${r.id}">Cung đường: ${esc(r.name)} ›</button>`).join("")}</div>` : "";
   const secs = p.sections.map((s) => `<section class="d-sec"><div class="sec-h"><h3>${esc(s.title)}</h3></div>${prose(s.body)}</section>`).join("");
   const foot = p.link || p.sources ? `<div class="d-sec">${p.link ? `<div class="actions"><a class="btn small ghost" href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener">Mở link tham khảo</a></div>` : ""}${p.sources ? `<p class="src">Nguồn: ${esc(p.sources)}</p>` : ""}</div>` : "";
   box.innerHTML = `<div class="d-top"><div class="wrap">
@@ -967,7 +1123,7 @@ function renderDetail() {
       <span class="grow"></span>
       <button class="btn small ${done ? "" : "ghost"}" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}">${done ? "✓ Đã ghé" : "Đánh dấu đã ghé"}</button>
     </div></div>
-    <div class="wrap"><div class="d-body">${gal}${head}${status}${intro}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}</div></div>`;
+    <div class="wrap"><div class="d-body">${gal}${head}${rel}${status}${intro}${insideSec}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}</div></div>`;
   vnWrap(box);
   if (wasHidden) { box.hidden = false; box.scrollTop = 0; document.body.style.overflow = "hidden"; } else box.scrollTop = sc;
 }
@@ -1069,7 +1225,7 @@ let toastT;
 function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2400); }
 
 /* ---------- events ---------- */
-function setTab(t) { ui.tab = t; try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo(0, 0); }
+function setTab(t) { ui.tab = t; if (t === "places") { ui.pcity = null; ui.route = ""; ui.mapSel = null; } try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo(0, 0); }
 document.addEventListener("click", (e) => {
   const tabEl = e.target.closest("[data-tab]");
   if (tabEl) { setTab(tabEl.dataset.tab); return; }
@@ -1110,7 +1266,27 @@ document.addEventListener("click", (e) => {
     case "fitAll": if (MAP) fitTo(mapList()); break;
     case "saveTiles": saveTiles(); break;
     case "amapHotel": { const h = hotels().find((x) => x.id === id); if (h) openAmap({ name: h.title, addrZh: h.addrZh, city: h.addrZh.includes("上海") ? "sh" : "hz" }); break; }
-    case "showOnMap": closeDetail(); ui.tab = "places"; ui.view = "map"; saveUi(); setTimeout(() => selectOnMap(id), 50); break;
+    case "showOnMap": {
+      const p = PL[id]; if (!p) break;
+      closeDetail(); ui.tab = "places"; ui.view = "map"; ui.route = p.stopOf || ""; saveUi();
+      ui.pcity = p.city === "both" ? (inCityBox("hz", p.loc) ? "hz" : "sh") : p.city || "sh";
+      setTimeout(() => selectOnMap(id), 50); break;
+    }
+    case "cityGo":
+      ui.pcity = el.dataset.c; ui.route = ""; ui.mapSel = null;
+      if (el.dataset.cat) { ui.cat = el.dataset.cat; ui.view = "list"; }
+      if (el.dataset.view) ui.view = el.dataset.view;
+      saveUi(); render(); window.scrollTo(0, 0); break;
+    case "cityBack": ui.pcity = null; ui.route = ""; ui.mapSel = null; render(); window.scrollTo(0, 0); break;
+    case "route": ui.route = el.dataset.v; ui.mapSel = null; render(); break;
+    case "goRoute": {
+      const r = RT[id]; if (!r) break;
+      if (detailId) closeDetail();
+      Object.assign(ui, { tab: "places", pcity: r.city, route: id, view: "list", mapSel: null });
+      try { history.replaceState(null, "", "#places"); } catch (e) {}
+      render(); window.scrollTo(0, 0); break;
+    }
+    case "routePhoto": { const r = RT[id]; if (r) { lb = { ids: r.photos, i: 0 }; drawLb(); } break; }
     case "lbPrev": lb.i--; drawLb(); break;
     case "lbNext": if (lb && lb.ids.length > 1) { lb.i++; drawLb(); } break;
     case "day": ui.day = +el.dataset.v; render(); break;
@@ -1174,7 +1350,9 @@ if (TITLES[h0]) ui.tab = h0;
 render();
 fetch("data.json").then((r) => r.json()).then((data) => {
   D = data;
-  D.places.forEach((p) => (PL[p.id] = p));
+  D.routes = D.routes || []; D.stops = D.stops || [];
+  D.places.concat(D.stops).forEach((p) => (PL[p.id] = p));
+  D.routes.forEach((r) => (RT[r.id] = r));
   if (h0.startsWith("place-") && PL[h0.slice(6)]) { ui.tab = "places"; detailId = h0.slice(6); }
   render();
   if (off.sw) {
