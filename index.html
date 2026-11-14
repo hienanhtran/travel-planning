@@ -313,6 +313,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .prose p{margin:0}
 .prose ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
 .prose h4{margin:6px 0 0;font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.3}
+.prose h5{margin:4px 0 0;font-weight:800;font-size:15px;line-height:1.3;color:var(--ink-soft)}
+.pimgs{display:grid;gap:6px;grid-template-columns:repeat(3,1fr)}
+.pimgs.n1{grid-template-columns:1fr}
+.pimgs.n2{grid-template-columns:1fr 1fr}
+.pimgs button{border:0;padding:0;background:var(--surface-2);border-radius:14px;overflow:hidden;aspect-ratio:4/3}
+.pimgs.n1 button{aspect-ratio:16/10}
+.pimgs img{width:100%;height:100%;object-fit:cover;display:block}
 .prose blockquote{margin:2px 0;padding:10px 14px;border-left:4px solid var(--line);background:var(--surface-2);border-radius:0 12px 12px 0;font-size:16px;line-height:1.7}
 .d-mode{position:sticky;top:64px;z-index:3;box-shadow:var(--shadow)}
 .toc{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
@@ -758,7 +765,7 @@ function placeCard(p, o = {}) {
     </div>
     <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${chain}${inside}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
-    ${p.photos.length ? `<button class="card-main" data-act="openPlace" data-id="${p.id}" aria-label="Xem ${esc(p.name)}"><img class="pc-img" src="${p.photos[0]}" alt="" loading="lazy"></button>` : ""}
+    ${(p.cover || p.photos[0]) ? `<button class="card-main" data-act="openPlace" data-id="${p.id}" aria-label="Xem ${esc(p.name)}"><img class="pc-img" src="${p.cover || p.photos[0]}" alt="" loading="lazy"></button>` : ""}
     ${o.stopNote ? `<p class="note"><b>Ở cung này:</b> ${esc(o.stopNote)}</p>` : ""}
     ${p.note && !(o.stopNote && p.stopOf) ? `<p class="note">${esc(clip(p.note.split("\n")[0], 140))}</p>` : ""}
     <div class="actions">
@@ -1239,23 +1246,30 @@ function viewInfo() {
 
 /* ---------- detail ---------- */
 let detailId = null, lb = null, detailMode = "visit";
+/* inline text: escape, then **đậm** */
+const rt = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
 function prose(text) {
-  let html = "", ul = [], tbl = [], qt = [];
+  let html = "", ul = [], tbl = [], qt = [], im = [];
   const flush = () => {
-    if (qt.length) { html += `<blockquote>${qt.map(esc).join("<br>")}</blockquote>`; qt = []; }
-    if (ul.length) { html += `<ul>${ul.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>`; ul = []; }
-    if (tbl.length) { html += `<div class="tbl"><table>${tbl.map((r, i) => `<tr>${r.map((c) => (i === 0 ? `<th>${esc(c)}</th>` : `<td>${esc(c)}</td>`)).join("")}</tr>`).join("")}</table></div>`; tbl = []; }
+    if (im.length) { const n = Math.min(im.length, 3); html += `<div class="pimgs n${n}">${im.map((x) => `<button data-act="lbImg" data-v="${esc(x.u)}" aria-label="Xem ảnh${x.alt ? ": " + esc(x.alt) : ""}"><img src="${esc(x.u)}" alt="${esc(x.alt)}" loading="lazy"></button>`).join("")}</div>`; im = []; }
+    if (qt.length) { html += `<blockquote>${qt.map(rt).join("<br>")}</blockquote>`; qt = []; }
+    if (ul.length) { html += `<ul>${ul.map((l) => `<li>${rt(l)}</li>`).join("")}</ul>`; ul = []; }
+    if (tbl.length) { html += `<div class="tbl"><table>${tbl.map((r, i) => `<tr>${r.map((c) => (i === 0 ? `<th>${rt(c)}</th>` : `<td>${rt(c)}</td>`)).join("")}</tr>`).join("")}</table></div>`; tbl = []; }
   };
   for (const raw of String(text || "").split(/\r?\n/)) {
     const l = raw.trim();
-    if (!l) { flush(); continue; }
+    if (!l) { if (!im.length) flush(); continue; }
+    const imgs = [...l.matchAll(/!\[([^\]]*)\]\(([^)\s]+)\)/g)];
+    if (imgs.length && !l.replace(/!\[[^\]]*\]\([^)\s]+\)/g, "").replace(/^[-*]\s*/, "").trim()) { if (!im.length) flush(); imgs.forEach((m) => im.push({ alt: m[1], u: m[2] })); continue; }
+    if (im.length) flush();
     if (/^>\s?/.test(l)) { if (ul.length || tbl.length) flush(); qt.push(l.replace(/^>\s?/, "")); continue; }
     if (qt.length) flush();
-    if (/^#{3,6}\s+/.test(l)) { flush(); html += `<h4>${esc(l.replace(/^#+\s+/, ""))}</h4>`; continue; }
+    if (/^#{5,6}\s+/.test(l)) { flush(); html += `<h5>${esc(l.replace(/^#+\s+/, "").replace(/\*\*/g, ""))}</h5>`; continue; }
+    if (/^#{3,4}\s+/.test(l)) { flush(); html += `<h4>${esc(l.replace(/^#+\s+/, "").replace(/\*\*/g, ""))}</h4>`; continue; }
     if (/^\|?\s*:?-{2,}/.test(l)) continue;
     if (l.includes("|")) { if (ul.length) flush(); tbl.push(l.replace(/^\||\|$/g, "").split("|").map((s) => s.trim())); continue; }
     if (/^[-•*]\s+/.test(l)) { if (tbl.length) flush(); ul.push(l.replace(/^[-•*]\s+/, "")); continue; }
-    flush(); html += `<p>${esc(l)}</p>`;
+    flush(); html += `<p>${rt(l)}</p>`;
   }
   flush();
   return `<div class="prose">${html}</div>`;
@@ -1271,7 +1285,7 @@ function renderDetail() {
   const head = `<div class="d-head"><h2>${esc(p.name)}</h2>${p.zh ? `<div class="zh">${esc(p.zh)}${p.py ? ` <span class="py">${esc(p.py)}</span>` : ""}</div>` : ""}<div class="d-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div></div>`;
   const status = STATUS[p.status] ? `<div class="status st-${p.status}"><i></i><span>${STATUS[p.status]}</span></div>` : "";
   const intro = p.note ? prose(p.note) : "";
-  const dishSec = p.dishes.length ? `<section class="d-sec"><div class="sec-h"><h3>Món đáng thử</h3></div><div>${p.dishes.map((d, i) => `<div class="dish"><button class="dish-th" data-act="dishPhoto" data-i="${i}" aria-label="Ảnh món ${esc(d.vi || d.zh)}">${d.photo ? `<img src="${d.photo}" alt="" loading="lazy">` : esc((d.zh || d.vi || "?").slice(0, 1))}</button><button class="dish-b" data-act="showDish" data-i="${i}"><b>${d.zh ? `<span class="zh">${esc(d.zh)}</span> ` : ""}${d.py ? `(${esc(d.py)}) ` : ""}${d.vi ? `– ${esc(d.vi)}` : ""}</b>${d.desc ? `<span>${esc(d.desc)}</span>` : ""}${d.must ? '<span class="try">Nên thử</span>' : ""}</button></div>`).join("")}</div></section>` : "";
+  const dishSec = p.dishes.length ? `<section class="d-sec"><div class="sec-h"><h3>Món đáng thử</h3></div>${p.dishIntro ? prose(p.dishIntro) : ""}<div>${p.dishes.map((d, i) => `<div class="dish"><button class="dish-th" data-act="dishPhoto" data-i="${i}" aria-label="Ảnh món ${esc(d.vi || d.zh)}">${d.photo ? `<img src="${d.photo}" alt="" loading="lazy">` : esc((d.zh || d.vi || "?").slice(0, 1))}</button><button class="dish-b" data-act="showDish" data-i="${i}"><b>${d.zh ? `<span class="zh">${esc(d.zh)}</span> ` : ""}${d.py ? `(${esc(d.py)}) ` : ""}${d.vi ? `– ${esc(d.vi)}` : ""}</b>${d.desc ? `<span>${esc(d.desc)}</span>` : ""}${d.must ? '<span class="try">Nên thử</span>' : ""}</button></div>`).join("")}</div></section>` : "";
   const addr = `<section class="d-sec"><div class="sec-h"><h3>Địa chỉ và cách đi</h3></div><div class="card addr">
     ${p.addrZh ? `<div class="zh-big">${esc(p.addrZh)}</div>` : ""}
     ${p.addrVi ? `<div class="en">${esc(p.addrVi)}</div>` : !p.addrZh ? `<div class="en">${esc(p.area || "Chưa có địa chỉ.")}</div>` : ""}
@@ -1400,7 +1414,8 @@ document.addEventListener("click", (e) => {
     case "showDish": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.zh) show(d.zh, d.py, d.vi); break; }
     case "hideShow": $("#show").hidden = true; break;
     case "lbOpen": { const p = PL[detailId]; if (p) { lb = { ids: p.photos, i: +el.dataset.i }; drawLb(); } break; }
-    case "dishPhoto": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.photo) { lb = { ids: [d.photo], i: 0 }; drawLb(); } break; }
+    case "lbImg": { const row = el.parentElement, ids = [...row.querySelectorAll("[data-act=lbImg]")].map((b) => b.dataset.v); lb = { ids, i: Math.max(0, ids.indexOf(el.dataset.v)) }; drawLb(); break; }
+    case "dishPhoto": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.photo) { lb = { ids: d.photos && d.photos.length ? d.photos : [d.photo], i: 0 }; drawLb(); } break; }
     case "lbClose": lb = null; drawLb(); break;
     case "openPose": openPose(id, +el.dataset.i); break;
     case "pvClose": pv = null; drawPv(); break;
