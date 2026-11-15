@@ -379,8 +379,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .mc-top h3{margin:0;font-size:17px}
 .mc-top .x{margin:-8px -8px 0 0}
 .map-card .pc-img{aspect-ratio:4/3}
-.near.stops .near-row{grid-template-columns:34px 56px 1fr auto}
-.near-th{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--surface-2);display:block}
+.near.stops .near-row{grid-template-columns:30px 112px 1fr auto}
+.near-th{width:112px;height:84px;border-radius:12px;overflow:hidden;background:var(--surface-2);display:block}
+.near-th img{width:100%;height:100%;object-fit:cover;display:block}
+.near.stops .near-main b,.near.stops .near-main span{overflow-wrap:anywhere}
 .near{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
 .near-row{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:11px 14px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:var(--ink)}
 .near-row:first-child{border-top:0}
@@ -866,7 +868,7 @@ function placeCard(p, o = {}) {
     </div>
     <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${chain}${inside}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
-    ${(o.img || placeImg(p)) ? `<button class="card-main" data-act="openPlace" data-id="${p.id}" aria-label="Xem ${esc(p.name)}"><img class="pc-img" src="${o.img || placeImg(p)}" alt="" loading="lazy"></button>` : ""}
+    ${(o.img || placeImg(p)) ? `<button class="card-main" data-act="photo" data-v="${o.img || placeImg(p)}" aria-label="Xem ảnh ${esc(p.name)}"><img class="pc-img" src="${o.img || placeImg(p)}" alt="" loading="lazy"></button>` : ""}
     ${o.stopNote ? `<p class="note"><b>Ở cung này:</b> ${esc(o.stopNote)}</p>` : ""}
     ${p.note && !(o.stopNote && p.stopOf) ? `<p class="note">${esc(clip(p.note.split("\n")[0], 140))}</p>` : ""}
     <div class="actions">
@@ -922,7 +924,7 @@ function viewMap(ps) {
   } else if (sel) {
     const d = me ? distM([me.lat, me.lng], sel.loc) : null;
     card = `<div class="card map-card"><div class="mc-top"><div style="min-width:0"><h3>${esc(sel.name)}</h3>${sel.zh ? `<div class="zh">${esc(sel.zh)}</div>` : ""}</div><button class="x" data-act="mapSel" data-id="" aria-label="Đóng">×</button></div>
-      ${stopImg(sel.id) ? `<button class="card-main" data-act="openPlace" data-id="${sel.id}" aria-label="Xem ${esc(sel.name)}"><img class="pc-img" src="${stopImg(sel.id)}" alt="" loading="lazy"></button>` : ""}
+      ${stopImg(sel.id) ? `<button class="card-main" data-act="photo" data-v="${stopImg(sel.id)}" aria-label="Xem ảnh ${esc(sel.name)}"><img class="pc-img" src="${stopImg(sel.id)}" alt="" loading="lazy"></button>` : ""}
       <div class="meta">${sel.city ? `<span>${CITIES[sel.city]}</span><span>·</span>` : ""}<span>${CATS[sel.cat] || "Khác"}</span>${d != null ? `<span>· ${fmtDist(d)} · ${walkTxt(d)}</span>` : ""}${sel.locSrc === "gan-dung" ? "<span>· vị trí gần đúng</span>" : ""}</div>
       <div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${sel.id}">Xem chi tiết</button>${sel.zh || sel.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${sel.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${sel.id}">Mở Amap</button></div></div>`;
   }
@@ -933,9 +935,9 @@ function viewMap(ps) {
     near = `<section class="sec"><div class="sec-h"><h2>Các điểm trên cung</h2><span class="meta">${st.length} điểm</span></div>
       <div class="near stops">${st.map((s, i) => {
         const d = me && s.p.loc ? distM([me.lat, me.lng], s.p.loc) : null;
-        return `<button class="near-row" data-act="${s.p.loc ? "mapSel" : "openPlace"}" data-id="${s.p.id}">
+        return `<button class="near-row" data-act="openPlace" data-id="${s.p.id}">
         <span class="stepno" ${isDone(s.p.id) ? 'style="background:#A99BC2"' : ""}>${isDone(s.p.id) ? "✓" : i + 1}</span>
-        ${stopImg(s.p.id) ? `<img class="near-th" src="${stopImg(s.p.id)}" alt="" loading="lazy">` : '<span class="near-th"></span>'}
+        ${stopImg(s.p.id) ? `<span class="near-th" role="button" aria-label="Xem ảnh" data-act="photo" data-v="${stopImg(s.p.id)}"><img src="${stopImg(s.p.id)}" alt="" loading="lazy"></span>` : '<span class="near-th"></span>'}
         <span class="near-main"><b>${esc(s.p.name)}</b><span>${s.p.zh ? esc(s.p.zh) : ""}${!s.p.loc ? " · chưa có vị trí" : ""}</span></span>
         <span class="near-d">${d != null ? `<b>${fmtDist(d)}</b><span>${walkTxt(d)}</span>` : ""}</span></button>`;
       }).join("")}</div></section>`;
@@ -1625,6 +1627,7 @@ document.addEventListener("click", (e) => {
       try { history.replaceState(null, "", "#places"); } catch (e) {}
       render(); window.scrollTo(0, 0); break;
     }
+    case "photo": if (el.dataset.v) { lb = { ids: [el.dataset.v], i: 0 }; drawLb(); } break;
     case "routePhoto": { const r = RT[id]; if (r) { lb = { ids: r.photos, i: 0 }; drawLb(); } break; }
     case "lbPrev": lb.i--; drawLb(); break;
     case "lbNext": if (lb && lb.ids.length > 1) { lb.i++; drawLb(); } break;
