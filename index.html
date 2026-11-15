@@ -80,7 +80,8 @@ main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 .view{display:flex;flex-direction:column;gap:18px;padding-block:4px 8px}
 
 /* stamp */
-.stamp{--r:6px;-webkit-mask:radial-gradient(var(--r),#0000 97%,#000) round calc(-1.5*var(--r)) calc(-1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)),linear-gradient(#000 0 0) no-repeat 50%/calc(100% - 3*var(--r)) calc(100% - 3*var(--r));mask:radial-gradient(var(--r),#0000 97%,#000) round calc(-1.5*var(--r)) calc(-1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)),linear-gradient(#000 0 0) no-repeat 50%/calc(100% - 3*var(--r)) calc(100% - 3*var(--r))}
+.stamp{--r:6px;position:relative}
+.stamp::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;--dot:radial-gradient(circle,var(--bg) calc(var(--r) - .6px),#0000 var(--r));background:var(--dot) 0 calc(-1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)) space no-repeat,var(--dot) 0 calc(100% + 1.5*var(--r))/calc(3*var(--r)) calc(3*var(--r)) space no-repeat,var(--dot) calc(-1.5*var(--r)) 0/calc(3*var(--r)) calc(3*var(--r)) no-repeat space,var(--dot) calc(100% + 1.5*var(--r)) 0/calc(3*var(--r)) calc(3*var(--r)) no-repeat space}
 
 .hero{background:var(--hero-bg);color:var(--hero-ink);padding:30px 26px 26px;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;inset:0;opacity:.18;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
@@ -598,6 +599,28 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 /* reader: plain table of contents */
 .toc-row{grid-template-columns:1fr auto!important}
 .toc-row .chev{color:var(--ink-soft);font-weight:800;align-self:center}
+
+/* places: compact controls, route picker, search, back-to-top, pinyin */
+.ctl{display:flex;flex-direction:column;gap:8px;margin-top:-6px}
+.seg.sm{border-radius:14px;padding:3px}
+.seg.sm button{min-height:34px;font-size:13px;border-radius:11px}
+.chips.sm{gap:6px}
+.chips.sm .chip{min-height:32px;padding:0 11px;font-size:13px}
+.route-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:38px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:0 12px;font-size:13px;color:var(--ink-soft);text-align:left}
+.route-pick b{flex:1;min-width:0;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.route-pick.on{border-color:var(--lilac-deep);background:var(--lilac-soft)}
+.route-pick.on b{color:var(--lilac-deep)}
+.route-pick i{font-style:normal;font-weight:800}
+.sheet .near-row{grid-template-columns:1fr auto}
+.sheet .near-row.on{background:var(--lilac-soft)}
+.top .icon-btn.srch{width:40px;height:40px;border-radius:13px}
+.top .icon-btn.srch svg{width:20px;height:20px}
+.sr-top .wrap{gap:8px}
+.sr-top input{flex:1;min-height:44px}
+.totop{position:fixed;z-index:7;right:max(16px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);display:grid;place-items:center;box-shadow:0 8px 20px -8px rgba(0,0,0,.5);opacity:.92}
+.totop svg{width:22px;height:22px}
+@media (min-width:600px){.totop{right:calc(50% - 280px + 16px)}}
+.pcard .pc-py{font-size:12px;font-weight:600;opacity:.75;margin-top:3px;line-height:1.3}
 </style>
 </head>
 <body>
@@ -605,6 +628,7 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 <header class="top">
   <div class="wrap">
     <h1 id="pageTitle"><small>Thượng Hải · Hàng Châu</small><span>Tổng quan</span></h1>
+    <button class="icon-btn srch" data-act="openSearch" aria-label="Tìm địa điểm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
   </div>
 </header>
 
@@ -621,6 +645,9 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 
 <div class="detail" id="detail" hidden></div>
 <div class="detail" id="rd" hidden></div>
+<div class="detail" id="sr" hidden></div>
+<div class="sheet-wrap" id="sheet" hidden></div>
+<button class="totop" id="totop" data-act="toTop" aria-label="Lên đầu trang" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <div class="lb" id="lb" hidden></div>
 <div class="pv" id="pv" hidden></div>
 <button class="show" id="show" hidden data-act="hideShow"></button>
@@ -760,7 +787,7 @@ function vnWrap(root) {
   if (!root) return;
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     // Chinese names (.zh, .pc-zh) are not Vietnamese: gluing their Latin words makes long unbreakable runs
-    acceptNode: (n) => (n.parentElement && (/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentElement.tagName) || n.parentElement.closest(".pc-zh,.zh")) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    acceptNode: (n) => (n.parentElement && (/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentElement.tagName) || n.parentElement.closest(".pc-zh,.zh,.pc-py")) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
   });
   const nodes = [];
   while (walk.nextNode()) nodes.push(walk.currentNode);
@@ -825,7 +852,7 @@ function placeCard(p, o = {}) {
   return `<article class="pcard stamp ${pc === "hz" ? "alt" : ""} ${done ? "done" : ""}">
     <div class="card-top">
       <button class="card-main" data-act="openPlace" data-id="${p.id}" style="color:inherit">
-        ${p.zh ? `<div class="pc-zh">${esc(p.zh)}</div>` : ""}
+        ${p.zh ? `<div class="pc-zh">${esc(p.zh)}</div>` : ""}${p.py ? `<div class="pc-py">${esc(p.py)}</div>` : ""}
         <h3 class="pc-name">${esc(p.name)}</h3>
       </button>
       ${done ? '<span class="pm">ĐÃ GHÉ</span>' : ""}
@@ -1127,22 +1154,21 @@ function viewPlaces() {
   const bar = `<div class="city-bar"><button class="icon-btn" data-act="cityBack" aria-label="Chọn thành phố khác"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
     <div class="grow"><b>${CITIES[c]}</b><small>${all.length} địa điểm${rs.length ? ` · ${rs.length} cung đường` : ""}</small></div>
     <button class="btn small ghost" data-act="cityGo" data-c="${OTHER_CITY[c]}">${CITIES[OTHER_CITY[c]]} ›</button></div>`;
-  const vt = `<div class="seg seg2" role="group" aria-label="Cách xem"><button data-act="view" data-v="list" aria-pressed="${ui.view !== "map"}">Địa điểm</button><button data-act="view" data-v="map" aria-pressed="${ui.view === "map"}">Bản đồ</button></div>`;
-  const rchips = rs.length ? `<div class="lbl-row">Cung đường</div><div class="chips" role="group" aria-label="Cung đường">
-    <button class="chip route" data-act="route" data-v="" aria-pressed="${!r}">Không chọn</button>
-    ${rs.map((x) => `<button class="chip route" data-act="route" data-v="${x.id}" aria-pressed="${ui.route === x.id}">${esc(x.name)}<small>${x.stops.length}</small></button>`).join("")}</div>` : "";
-  if (r) return bar + vt + rchips + (ui.view === "map" ? viewMap(routeStops(r).map((s) => s.p)) : routeList(r));
+  const vtSeg = `<div class="seg seg2 sm" role="group" aria-label="Cách xem"><button data-act="view" data-v="list" aria-pressed="${ui.view !== "map"}">Địa điểm</button><button data-act="view" data-v="map" aria-pressed="${ui.view === "map"}">Bản đồ</button></div>`;
+  const rpick = rs.length ? `<button class="route-pick ${r ? "on" : ""}" data-act="routePick"><span>🧭 Cung đường</span><b>${r ? esc(r.name) : "Không chọn"}</b><i>▾</i></button>` : "";
+  if (r) return bar + `<div class="ctl">${vtSeg}${rpick}</div>` + (ui.view === "map" ? viewMap(routeStops(r).map((s) => s.p)) : routeList(r));
   const ps = all.filter((p) => (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)))
     .sort((a, b) => (isDone(a.id) ? 1 : 0) - (isDone(b.id) ? 1 : 0) || (b.must ? 1 : 0) - (a.must ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0));
   const n = (k) => all.filter((p) => k === "all" || p.cat === k).length;
-  const chips = `<div class="lbl-row">Loại</div><div class="chips" role="group" aria-label="Loại">${[["all", "Mọi loại"], ...Object.entries(CATS)].filter(([k]) => n(k)).map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}<small>${n(k)}</small></button>`).join("")}</div>`;
+  const chips = `<div class="chips sm" role="group" aria-label="Loại">${[["all", "All"], ...Object.entries(CATS)].filter(([k]) => n(k)).map(([k, l]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${ui.cat === k}">${l}<small>${n(k)}</small></button>`).join("")}</div>`;
   const tog = `<div class="toggle-row"><span>${ps.length} địa điểm</span><button class="switch" data-act="hideDone" aria-pressed="${ui.hideDone}"><i></i>Ẩn chỗ đã đi</button></div>`;
-  if (ui.view === "map") return bar + vt + rchips + chips + tog + viewMap(ps);
+  const ctl = `<div class="ctl">${vtSeg}${rpick}${chips}${tog}</div>`;
+  if (ui.view === "map") return bar + ctl + viewMap(ps);
   const sc = savedChains().filter((p) => ui.cat === "all" || p.cat === ui.cat);
   const saved = c === "hz" && sc.length ? `<div class="card saved"><b>Chưa kịp thử ở Thượng Hải?</b><span class="note">Các chuỗi này có cả ở Hàng Châu, bạn chưa đánh dấu đã ghé:</span>
     <div class="chips">${sc.map((p) => `<button class="chip" data-act="openPlace" data-id="${p.id}">${esc(p.name)}</button>`).join("")}</div></div>` : "";
-  const body = ps.length ? `<div class="list">${ps.map((p) => placeCard(p)).join("")}</div>` : '<div class="empty"><b>Không có địa điểm nào khớp bộ lọc</b><span>Thử chọn "Mọi loại" hoặc tắt "Ẩn chỗ đã đi".</span></div>';
-  return bar + vt + rchips + chips + tog + saved + body;
+  const body = ps.length ? `<div class="list">${ps.map((p) => placeCard(p)).join("")}</div>` : '<div class="empty"><b>Không có địa điểm nào khớp bộ lọc</b><span>Thử chọn "All" hoặc tắt "Ẩn chỗ đã đi".</span></div>';
+  return bar + ctl + saved + body;
 }
 function legTxt(a, b) {
   if (!a.loc || !b.loc) return "";
@@ -1475,6 +1501,40 @@ function show(big, sub, vi, subZh) {
 let toastT;
 function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2400); }
 
+
+/* ---------- route picker (bottom sheet) ---------- */
+function openSheet(html) { const el = $("#sheet"); el.innerHTML = `<div class="scrim" data-act="closeSheet"></div><div class="sheet"><div class="grab"></div>${html}</div>`; el.hidden = false; vnWrap(el); }
+function closeSheet() { $("#sheet").hidden = true; }
+function routeSheet() {
+  const rs = cityRoutes(ui.pcity);
+  openSheet(`<h2>Cung đường ở ${CITIES[ui.pcity]}</h2><div class="near">
+    <button class="near-row ${!ui.route ? "on" : ""}" data-act="routeSet" data-v=""><span class="near-main"><b>Không chọn</b><span>Xem mọi địa điểm</span></span><span class="near-d"><b>${!ui.route ? "✓" : ""}</b></span></button>
+    ${rs.map((x) => `<button class="near-row ${ui.route === x.id ? "on" : ""}" data-act="routeSet" data-v="${x.id}"><span class="near-main"><b>${esc(x.name)}</b><span>${[x.stops.length + " điểm dừng", x.duration].filter(Boolean).map(esc).join(" · ")}</span></span><span class="near-d"><b>${ui.route === x.id ? "✓" : ""}</b></span></button>`).join("")}</div>`);
+}
+
+/* ---------- search ---------- */
+const fold = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[đĐ]/g, "d").toLowerCase();
+function openSearch() {
+  const el = $("#sr");
+  el.innerHTML = `<div class="d-top sr-top"><div class="wrap"><input id="srq" type="search" placeholder="Tên, chữ Hán, pinyin, khu vực…" autocomplete="off" enterkeyhint="search"><button class="btn small ghost" data-act="closeSearch">Đóng</button></div></div><div class="wrap"><div class="d-body" id="srr"></div></div>`;
+  el.hidden = false; document.body.style.overflow = "hidden";
+  const q = $("#srq");
+  q.addEventListener("input", () => drawSearch(q.value));
+  drawSearch("");
+  setTimeout(() => q.focus(), 60);
+}
+function closeSearch() { $("#sr").hidden = true; if (!detailId && !reader) document.body.style.overflow = ""; }
+function drawSearch(q) {
+  const words = fold(q).split(/\s+/).filter(Boolean), out = $("#srr");
+  if (!words.length) { out.innerHTML = `<p class="note">Gõ để tìm trong ${places().length} địa điểm. Không cần gõ dấu, ví dụ "cho dem", "molly", "外滩", "waitan".</p>`; return; }
+  const hit = places().filter((p) => { const t = fold([p.name, p.zh, p.py, p.area, (p.tags || []).join(" "), CATS[p.cat], CITIES[p.city]].join(" ")); return words.every((w) => t.includes(w)); });
+  out.innerHTML = hit.length ? `<p class="meta" style="margin:0">${hit.length} kết quả</p><div class="near">${hit.slice(0, 60).map((p) => `<button class="near-row" data-act="srOpen" data-id="${p.id}" style="grid-template-columns:1fr auto"><span class="near-main"><b>${esc(p.name)}</b><span>${[p.zh, CITIES[p.city], CATS[p.cat]].filter(Boolean).map(esc).join(" · ")}</span></span><span class="near-d"><b>›</b></span></button>`).join("")}</div>`
+    : `<div class="empty"><b>Không thấy địa điểm nào</b><span>Thử gõ ngắn hơn, hoặc tên tiếng Trung.</span></div>`;
+}
+
+/* ---------- back to top: appears once you have scrolled down a long list ---------- */
+window.addEventListener("scroll", () => { const b = $("#totop"), h = window.scrollY < 900; if (b && b.hidden !== h) b.hidden = h; }, { passive: true });
+
 /* ---------- events ---------- */
 function setTab(t) { ui.tab = t; if (t === "places") { ui.pcity = null; ui.route = ""; ui.mapSel = null; } try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo(0, 0); }
 document.addEventListener("click", (e) => {
@@ -1536,11 +1596,19 @@ document.addEventListener("click", (e) => {
     }
     case "cityGo":
       ui.pcity = el.dataset.c; ui.route = ""; ui.mapSel = null;
-      if (el.dataset.cat) { ui.cat = el.dataset.cat; ui.view = "list"; }
+      ui.cat = el.dataset.cat || "all";
+      if (el.dataset.cat) ui.view = "list";
       if (el.dataset.view) ui.view = el.dataset.view;
       saveUi(); render(); window.scrollTo(0, 0); break;
     case "cityBack": ui.pcity = null; ui.route = ""; ui.mapSel = null; render(); window.scrollTo(0, 0); break;
     case "route": ui.route = el.dataset.v; ui.mapSel = null; render(); break;
+    case "routePick": routeSheet(); break;
+    case "routeSet": closeSheet(); ui.route = el.dataset.v; ui.mapSel = null; render(); window.scrollTo(0, 0); break;
+    case "closeSheet": closeSheet(); break;
+    case "openSearch": openSearch(); break;
+    case "closeSearch": closeSearch(); break;
+    case "srOpen": closeSearch(); openPlace(id); break;
+    case "toTop": window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "goRoute": {
       const r = RT[id]; if (!r) break;
       if (detailId) closeDetail();
@@ -1564,6 +1632,8 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  if (!$("#sheet").hidden) { closeSheet(); return; }
+  if (!$("#sr").hidden && !detailId) { closeSearch(); return; }
   if (pv) { pv = null; drawPv(); } else if (reader) { if (reader.mode === "ch") { reader.mode = "toc"; drawReader(); } else closeReader(); } else if (lb) { lb = null; drawLb(); } else if (!$("#show").hidden) $("#show").hidden = true; else if (detailId) closeDetail();
 });
 function fromHash() {
