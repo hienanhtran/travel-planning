@@ -544,6 +544,60 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 .rd-done{background:var(--surface-2);border-radius:18px;padding:14px 16px;font-weight:700;display:flex;flex-direction:column;gap:4px}
 
 .links .btn{min-height:36px}
+
+/* home: map around you */
+.map-wrap.home{height:240px}
+.lc-more summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;min-height:40px;border-top:1px solid var(--line);padding-top:10px}
+.lc-more summary::-webkit-details-marker{display:none}
+.lc-more .chev{color:var(--ink-soft);font-weight:800;transition:transform .15s}
+.lc-more[open] .chev{transform:rotate(90deg)}
+.lc-more[open] summary{margin-bottom:8px}
+/* info: two groups, compact bookings, tips, dialogs */
+.grp{display:flex;gap:14px;align-items:center;padding:16px 18px;margin-top:10px;background:var(--hero-bg);color:var(--hero-ink);position:relative}
+.grp.trav{--hero-bg:var(--hero2-bg);--hero-ink:var(--hero2-ink);--hero-num:var(--hero2-num);--hero-num-ink:var(--hero2-num-ink)}
+.grp-n{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--hero-num);color:var(--hero-num-ink);font-family:var(--f-display);font-weight:800;font-size:22px}
+.grp h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.15}
+.grp p{margin:2px 0 0;font-size:13px;font-weight:600;opacity:.85}
+.bk-list{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
+.bk-row{border-top:1px solid var(--line)}
+.bk-row:first-child{border-top:0}
+.bk-row summary{list-style:none;display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:11px 14px;cursor:pointer}
+.bk-row summary::-webkit-details-marker{display:none}
+.bk-row .bk-ico{width:40px;height:40px;border-radius:12px}
+.bk-t{min-width:0;display:flex;flex-direction:column}
+.bk-t b{font-size:15px;line-height:1.3}
+.bk-t span{font-size:12px;font-weight:600;color:var(--ink-soft)}
+.bk-row .chev{color:var(--ink-soft);font-weight:800;transition:transform .15s}
+.bk-row[open] .chev{transform:rotate(90deg)}
+.bk-more{display:flex;flex-direction:column;gap:8px;padding:0 14px 14px 66px}
+.bk-more .zh{font-size:17px;font-weight:700}
+.tips{display:flex;flex-direction:column;gap:10px}
+.tip{border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:var(--pc-bg);color:var(--pc-ink)}
+.tip.t1{background:var(--pc2-bg);color:var(--pc2-ink)}
+.tip.t2{background:var(--surface);border:1.5px solid var(--line)}
+.tip-h{display:flex;gap:10px;align-items:center}
+.tip-ico{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--surface);font-size:21px;box-shadow:var(--shadow)}
+.tip.t2 .tip-ico{background:var(--surface-2)}
+.tip h3{margin:0;font-size:17px;font-family:var(--f-display);font-weight:800;line-height:1.2}
+.tip-big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tip-big b{font-family:var(--f-display);font-weight:800;font-size:30px;line-height:1;color:var(--grass-ink);white-space:nowrap}
+.tip.t1 .tip-big b{color:var(--lilac-deep)}
+.tip-big span{font-size:13px;font-weight:600;opacity:.85}
+.tip .prose{font-size:14px;line-height:1.55}
+.tip-tag{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--warn-bg);color:var(--warn-ink)}
+.tipchip small{margin-left:4px}
+.dlg-btn{width:100%;justify-content:center}
+.chat{display:flex;flex-direction:column;gap:8px}
+.bub{max-width:86%;align-self:flex-start;display:flex;flex-direction:column;gap:2px;text-align:left;border:0;border-radius:18px 18px 18px 6px;padding:9px 13px;background:var(--surface);border:1.5px solid var(--line);color:var(--ink)}
+.bub.me{align-self:flex-end;border-radius:18px 18px 6px 18px;background:var(--pc2-bg);border-color:transparent}
+.bub small{font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+.bub .zh{font-size:19px;font-weight:700;color:var(--lilac-deep);line-height:1.35}
+.bub i{font-size:13px;color:var(--ink-soft)}
+.bub span:last-child{font-size:14px}
+.dlg h3{margin:6px 0 2px;font-family:var(--f-display);font-weight:800;font-size:18px}
+/* reader: plain table of contents */
+.toc-row{grid-template-columns:1fr auto!important}
+.toc-row .chev{color:var(--ink-soft);font-weight:800;align-self:center}
 </style>
 </head>
 <body>
@@ -670,7 +724,7 @@ function render() {
   if (!D) return;
   $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, info: viewInfo })[ui.tab]();
   vnWrap($("#view"));
-  if (onMap()) attachMap(); else stopGeo();
+  if (onMap() || (ui.tab === "home" && $("#mapSlot"))) attachMap(); else stopGeo();
   renderDetail();
 }
 
@@ -699,7 +753,8 @@ function vnGlue(s) {
     .replace(/((?:^|[\s(¥₫])[¥₫]?\d(?:[\d.,:/–-]*\d)?%?)[ \t]+(?=[^\s\d–-])/gu, "$1" + NB)
     .replace(VN_LEAD, (m, pre, w) => pre + w + NB)
     // no single word alone on the last line of a text run
-    .replace(/[ \t]+(\S{1,12})\s*$/u, NB + "$1");
+    // (keep the trailing space: the text may go on in a <b> right after this node)
+    .replace(/[ \t]+(\S{1,12})(\s*)$/u, NB + "$1$2");
 }
 function vnWrap(root) {
   if (!root) return;
@@ -734,20 +789,33 @@ function viewHome() {
   const dates = a ? `${DOW[a.getDay()]} ${ddmm(a)}${b ? " – " + DOW[b.getDay()] + " " + ddmm(b) + "/" + b.getFullYear() : ""} · ${numDays()} ngày` : "Chưa ghi ngày đi trong lich-trinh.md";
   const hero = `<section class="hero stamp"><div class="hero-zh">上海<i>·</i>杭州</div><div class="hero-title">${esc(D.info.name || "Thượng Hải & Hàng Châu")}</div><div class="hero-dates">${dates}</div>${count}</section>`;
   const pl = places(), done = pl.filter((p) => isDone(p.id)).length;
-  const ck = D.info.checklist, ckd = ck.filter(ckDone).length;
-  const stats = `<div class="stats">
+  const stats = `<div class="stats" style="grid-template-columns:1fr 1fr">
     <button class="stat" data-tab="places"><b>${pl.length}</b><span>Địa điểm · ${done} đã đi</span></button>
     <button class="stat" data-tab="plan"><b>${planItems().length}</b><span>Hoạt động trong ${numDays()} ngày</span></button>
-    <button class="stat" data-tab="info"><b>${ckd}/${ck.length}</b><span>Đã chuẩn bị</span><div class="bar"><i style="width:${ck.length ? Math.round((ckd / ck.length) * 100) : 0}%"></i></div></button>
   </div>`;
   const d = currentDay() || 1, dd = dayDate(d);
   const items = planItems().filter((p) => p.day === d).sort(byTime);
   const next = `<section class="sec"><div class="sec-h"><h2>${currentDay() ? "Hôm nay" : "Ngày đầu tiên"}${dd ? ` · ${DOW[dd.getDay()]} ${ddmm(dd)}` : ""}</h2><button class="link" data-act="goDay" data-day="${d}">Xem cả ngày</button></div>
     ${items.length ? `<div class="tl">${items.map(tlItem).join("")}</div>` : '<div class="empty"><span>Chưa có hoạt động cho ngày này.</span></div>'}</section>`;
-  const must = pl.filter((p) => p.must && !isDone(p.id)).slice(0, 4);
-  const mustSec = must.length ? `<section class="sec"><div class="sec-h"><h2>Nhất định phải đi</h2><button class="link" data-tab="places">Xem hết</button></div><div class="list">${must.map(placeCard).join("")}</div></section>` : "";
-  return hero + offlineCard() + stats + next + mustSec;
+  return hero + offlineCard() + stats + homeNear() + next;
 }
+/* home: small map with your position and the closest places */
+function homeNear() {
+  let list;
+  if (me) {
+    const rows = places().filter((p) => p.loc).map((p) => ({ p, d: distM([me.lat, me.lng], p.loc), b: bearing([me.lat, me.lng], p.loc) })).sort((a, b) => a.d - b.d).slice(0, 5);
+    list = `${rows.length && rows[0].d > 50000 ? `<p class="note">Bạn đang cách các địa điểm ${fmtDist(rows[0].d)}. Danh sách sẽ có ích khi bạn tới Thượng Hải hoặc Hàng Châu.</p>` : ""}
+      <div class="near">${rows.map((r) => `<button class="near-row" data-act="openPlace" data-id="${r.p.id}">
+        <span class="near-dir" style="transform:rotate(${Math.round(r.b)}deg)">${ARROW}</span>
+        <span class="near-main"><b>${esc(r.p.name)}</b><span>${CATS[r.p.cat] || "Khác"} · ${DIRS[Math.round(r.b / 45) % 8]}${r.p.locSrc === "gan-dung" ? " · gần đúng" : ""}</span></span>
+        <span class="near-d"><b>${fmtDist(r.d)}</b><span>${walkTxt(r.d)}</span></span></button>`).join("")}</div>`;
+  } else {
+    list = `<div class="card near-empty"><span class="note">${geoErr || "Bật định vị để xem bạn đang ở đâu và quán nào gần nhất. Định vị dùng GPS nên vẫn chạy khi không có mạng."}</span><div class="actions"><button class="btn small" data-act="locate">Bật định vị</button></div></div>`;
+  }
+  return `<section class="sec"><div class="sec-h"><h2>Quanh bạn</h2><button class="link" data-act="homeFullMap">Mở bản đồ ›</button></div><div id="mapSlot" class="map-wrap home"></div>${list}</section>`;
+}
+const todayCity = () => { const c = planItems().filter((p) => p.day === (currentDay() || 1)).map((p) => p.city).find(Boolean); return c === "hz" ? "hz" : "sh"; };
+const meCity = () => (me && inCityBox("hz", [me.lat, me.lng]) ? "hz" : me && inCityBox("sh", [me.lat, me.lng]) ? "sh" : todayCity());
 
 function placeCard(p, o = {}) {
   const done = isDone(p.id);
@@ -880,26 +948,29 @@ function attachMap() {
     MAP.on("click", () => { if (ui.mapSel) { ui.mapSel = null; render(); } });
   }
   slot.replaceWith(mapEl);
+  mapEl.classList.toggle("home", ui.tab === "home");
   MAP.invalidateSize();
   drawMarkers();
-  startGeo();
+  // on the home page, location starts by itself only once the phone has allowed it before
+  if (ui.tab !== "home" || LS.get("geoOk", false)) startGeo();
 }
 const CITY_BOX = { sh: [30.85, 31.5, 121.0, 121.95], hz: [30.0, 30.5, 119.65, 120.45] };
 const inCityBox = (c, loc) => { const b = CITY_BOX[c]; return !b || (loc[0] >= b[0] && loc[0] <= b[1] && loc[1] >= b[2] && loc[1] <= b[3]); };
 const cityPlaces = (c) => places().filter((p) => inCity(p, c));
 const cityRoutes = (c) => routes().filter((r) => r.city === c);
 function mapList() {
+  if (ui.tab === "home") return places().filter((p) => p.loc);
   const r = ui.route && RT[ui.route];
   if (r) return routeStops(r).map((s) => s.p).filter((p) => p.loc);
   return cityPlaces(ui.pcity).filter((p) => p.loc && inCityBox(ui.pcity, p.loc) && (ui.cat === "all" || p.cat === ui.cat) && (!ui.hideDone || !isDone(p.id)));
 }
-const cityHotels = () => hotels().filter((h) => h.addrZh.includes(CITY_ZH[ui.pcity]));
+const cityHotels = () => (ui.tab === "home" ? hotels() : hotels().filter((h) => h.addrZh.includes(CITY_ZH[ui.pcity])));
 function drawMarkers() {
   markers.clearLayers();
   routeLayer.clearLayers();
   const list = mapList(), r = ui.route && RT[ui.route];
   const pin = (p, o) => L.marker(p.loc, { icon: pinIcon(p, o), zIndexOffset: ui.mapSel === p.id ? 1000 : o.num ? 600 : p.must && !o.faded ? 100 : 0 })
-    .on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(p.id); }).addTo(markers);
+    .on("click", (e) => { L.DomEvent.stopPropagation(e); if (ui.tab === "home") openPlace(p.id); else selectOnMap(p.id); }).addTo(markers);
   if (r) {
     // the route: other places of the city stay as faint dots, the stops are numbered and joined by a line
     const ids = new Set(list.map((p) => p.id));
@@ -914,7 +985,13 @@ function drawMarkers() {
   } else for (const p of list) pin(p, {});
   for (const h of cityHotels()) {
     L.marker(h.loc, { icon: L.divIcon({ className: "", html: `<div class="pin hotel ${ui.mapSel === h.id ? "sel" : ""}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="2"/></svg></div>`, iconSize: [32, 32], iconAnchor: [16, 16] }), zIndexOffset: 500 })
-      .on("click", (e) => { L.DomEvent.stopPropagation(e); selectOnMap(h.id); }).addTo(markers);
+      .on("click", (e) => { L.DomEvent.stopPropagation(e); if (ui.tab === "home") show(h.addrZh, "", h.title); else selectOnMap(h.id); }).addTo(markers);
+  }
+  if (ui.tab === "home") {
+    const hk = "home|" + (me ? 1 : 0);
+    if (hk !== lastFit) { lastFit = hk; if (me) MAP.setView([me.lat, me.lng], 15, { animate: false }); else fitTo(list.filter((p) => inCityBox(todayCity(), p.loc))); }
+    drawMe();
+    return;
   }
   const key = ui.pcity + "|" + ui.cat + "|" + ui.hideDone + "|" + (ui.route || "");
   if (key !== lastFit) { lastFit = key; fitTo(list); }
@@ -946,6 +1023,7 @@ function startGeo() {
     const prev = me;
     me = { lat, lng, acc: pos.coords.accuracy || 50 };
     geoErr = "";
+    if (!prev) LS.set("geoOk", true);
     drawMe();
     if (centerOnFix && MAP) { centerOnFix = false; MAP.setView([lat, lng], 16, { animate: false }); }
     if (!prev || distM([prev.lat, prev.lng], [lat, lng]) > 25) render();
@@ -953,7 +1031,7 @@ function startGeo() {
     geoErr = err.code === 1 ? "Chưa cho phép định vị. Vào Cài đặt › Quyền riêng tư & Bảo mật › Dịch vụ định vị, bật cho Safari (hoặc Trang web Safari), rồi mở lại app."
       : "Chưa lấy được vị trí. Ra chỗ thoáng hoặc thử lại sau ít giây.";
     stopGeo();
-    if (onMap()) render();
+    if (onMap() || ui.tab === "home") render();
   }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
 }
 function stopGeo() { if (geoWatch !== null) { navigator.geolocation.clearWatch(geoWatch); geoWatch = null; } }
@@ -1137,15 +1215,15 @@ function hotelCard(hs) {
 }
 function learnCard() {
   const city = (c) => { const b = bookOf("c:" + c), n = b.chapters.length;
-    return `<button class="lc ${c}" data-act="${n ? "openBook" : "noop"}" data-key="c:${c}"><span class="zh">${CITY_ZH[c]}</span><b>${CITIES[c]}</b><span>${n ? `${n} phần · đã đọc ${readCount(b)}/${n}` : "Sẽ thêm sau"}</span></button>`; };
+    return `<button class="lc ${c}" data-act="${n ? "openBook" : "noop"}" data-key="c:${c}"><span class="zh">${CITY_ZH[c]}</span><b>${CITIES[c]}</b><span>${n ? `${n} phần · ~${bookMins(b)} phút đọc` : "Sẽ thêm sau"}</span></button>`; };
   const withCul = places().filter((p) => (p.culture || []).length);
   const group = (c) => {
     const list = withCul.filter((p) => inCity(p, c));
     if (!list.length) return "";
-    return `<h4>Địa điểm ở ${CITIES[c]}</h4><div class="near">${list.map((p) => {
-      const b = bookOf("p:" + p.id), n = b.chapters.length, r = readCount(b);
-      return `<button class="near-row" data-act="learnPlace" data-id="${p.id}" style="grid-template-columns:1fr auto"><span class="near-main"><b>${esc(p.name)}</b><span>${n} phần · ${r ? `đã đọc ${r}/${n}` : `~${bookMins(b)} phút đọc`}</span></span><span class="near-d"><b>›</b></span></button>`;
-    }).join("")}</div>`;
+    return `<details class="lc-more"><summary><h4>Bài về địa điểm ở ${CITIES[c]} · ${list.length}</h4><span class="chev">›</span></summary><div class="near">${list.map((p) => {
+      const b = bookOf("p:" + p.id), n = b.chapters.length;
+      return `<button class="near-row" data-act="learnPlace" data-id="${p.id}" style="grid-template-columns:1fr auto"><span class="near-main"><b>${esc(p.name)}</b><span>${n} phần · ~${bookMins(b)} phút đọc</span></span><span class="near-d"><b>›</b></span></button>`;
+    }).join("")}</div></details>`;
   };
   const arts = group("sh") + group("hz");
   return `<section class="sec"><div class="sec-h"><h2>Hiểu nơi đây</h2></div><div class="card learn-card">
@@ -1153,9 +1231,8 @@ function learnCard() {
     ${arts || '<p class="note">Chưa có bài văn hoá – lịch sử nào. Thêm mục "## Hiểu nơi đây" vào file địa điểm.</p>'}</div></section>`;
 }
 
-/* ---------- reader: read "Hiểu nơi đây" one part at a time ---------- */
-let readMap = LS.get("read", {}), readPos = LS.get("readPos", {});
-let reader = null; // { key, i, mode: "toc" | "ch" }
+/* ---------- reader: read "Hiểu nơi đây" one part at a time, like a story ---------- */
+let reader = null; // { key, i, mode: "toc" | "ch" | "dlg" }
 function bookOf(key) {
   if (key.startsWith("p:")) { const p = PL[key.slice(2)]; return { key, title: p ? p.name : "", zh: p ? p.zh : "", chapters: (p && p.culture) || [], place: p && p.id }; }
   const c = key.slice(2);
@@ -1164,84 +1241,94 @@ function bookOf(key) {
 const chTitle = (c, i) => c.title || (i === 0 ? "Mở đầu" : "Phần " + (i + 1));
 const chMins = (c) => Math.max(1, Math.round(String(c.body || "").split(/\s+/).length / 200));
 const bookMins = (b) => b.chapters.reduce((t, c) => t + chMins(c), 0);
-const isRead = (b, i) => !!(readMap[b.key] && readMap[b.key][i]);
-const readCount = (b) => b.chapters.filter((_, i) => isRead(b, i)).length;
-function markRead(key, i) {
-  if (readMap[key] && readMap[key][i]) return;
-  readMap = { ...readMap, [key]: { ...(readMap[key] || {}), [i]: 1 } }; LS.set("read", readMap);
-}
-const preview = (t) => clip(String(t || "").split(/\r?\n/).map((l) => l.replace(/^([-*>|#\s]|\d+\.\s)+/, "").replace(/\|/g, " ").trim()).find((l) => l.length > 2) || "", 90);
+const preview = (t) => clip(String(t || "").split(/\r?\n/).map((l) => l.replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/^([-*>|#\s]|\d+\.\s)+/, "").replace(/\*\*/g, "").replace(/\|/g, " ").trim()).find((l) => l.length > 2) || "", 90);
 function tocHtml(b) {
-  const n = b.chapters.length, r = readCount(b), pos = readPos[b.key];
-  const nextUnread = b.chapters.findIndex((_, i) => !isRead(b, i));
-  const start = pos != null && pos < n && !isRead(b, pos) ? pos : nextUnread >= 0 ? nextUnread : 0;
-  const lbl = r === 0 && pos == null ? "Bắt đầu đọc" : r === n ? "Đọc lại từ đầu" : "Đọc tiếp";
   let part = "";
   const rows = b.chapters.map((c, i) => {
     const head = c.part && c.part !== part ? `<div class="toc-part">${esc(c.part)}</div>` : "";
     part = c.part || part;
-    if (c.part && c.title === c.part) return head + `<button class="toc-row ${isRead(b, i) ? "read" : ""} ${i === pos ? "cur" : ""}" data-act="readCh" data-key="${b.key}" data-i="${i}"><span class="toc-dot">${isRead(b, i) ? "✓" : ""}</span><span class="toc-t"><b>Giới thiệu phần</b><span>${esc(preview(c.body))}</span></span></button>`;
-    return head + `<button class="toc-row ${isRead(b, i) ? "read" : ""} ${i === pos ? "cur" : ""}" data-act="readCh" data-key="${b.key}" data-i="${i}">
-      <span class="toc-dot">${isRead(b, i) ? "✓" : ""}</span><span class="toc-t"><b>${esc(chTitle(c, i))}</b><span>${i === pos ? "Đang đọc dở · " : ""}${esc(preview(c.body))} · ${chMins(c)} phút</span></span></button>`;
+    const title = c.part && c.title === c.part ? "Giới thiệu phần" : chTitle(c, i);
+    return head + `<button class="toc-row" data-act="readCh" data-key="${b.key}" data-i="${i}"><span class="toc-t"><b>${esc(title)}</b><span>${esc(preview(c.body))} · ${chMins(c)} phút</span></span><span class="chev">›</span></button>`;
   }).join("");
-  return `<div class="book-sum"><div class="meta"><span>${n} phần</span><span>·</span><span>~${bookMins(b)} phút đọc</span><span>·</span><span>đã đọc ${r}/${n}</span></div>
-    <div class="bar"><i style="width:${n ? Math.round((r / n) * 100) : 0}%"></i></div>
-    <button class="btn lilac" data-act="readCh" data-key="${b.key}" data-i="${r === n ? 0 : start}"><span>${lbl}<small>${r === n ? esc(chTitle(b.chapters[0], 0)) : `${start + 1}/${n} · ${esc(chTitle(b.chapters[start], start))}`}</small></span></button></div>
-    <nav class="toc2" aria-label="Mục lục">${rows}</nav>`;
+  return `<p class="meta" style="margin:0">${b.chapters.length} phần · ~${bookMins(b)} phút đọc</p><nav class="toc2" aria-label="Mục lục">${rows}</nav>`;
 }
 const ICON_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
-let rdObs = null;
+function dialogsHtml() {
+  const G = D.info.dialogs || [];
+  const top = `<div class="d-top rd-top"><div class="wrap"><button class="icon-btn" data-act="closeReader" aria-label="Đóng">${ICON_BACK}</button><span class="grow"></span></div></div>`;
+  if (!G.length) return top + `<div class="wrap"><div class="d-body"><div class="d-head"><div class="rd-kicker">Câu tiếng Trung</div><h2>Hội thoại mẫu</h2></div>
+    <div class="empty"><b>Chưa có hội thoại</b><span>Các mẩu hội thoại theo tình huống (gọi món, đi taxi, mua sắm…) sẽ được thêm sau, trong du-lieu/hoi-thoai.md.</span></div></div></div>`;
+  const gi = Math.min(reader.g || 0, G.length - 1), g = G[gi];
+  const chips = G.length > 1 ? `<div class="chips">${G.map((x, i) => `<button class="chip" data-act="dlgG" data-i="${i}" aria-pressed="${i === gi}">${esc((x.icon ? x.icon + " " : "") + x.title)}</button>`).join("")}</div>` : "";
+  const scenes = g.scenes.map((sc, si) => `<section class="dlg">${sc.title ? `<h3>${esc(sc.title)}</h3>` : ""}${sc.note ? prose(sc.note) : ""}
+    <div class="chat">${sc.lines.map((l, li) => `<button class="bub ${l.me ? "me" : ""}" data-act="dlgLine" data-s="${si}" data-l="${li}"><small>${esc(l.who)}</small><span class="zh">${esc(l.zh)}</span>${l.py ? `<i>${esc(l.py)}</i>` : ""}${l.vi ? `<span>${esc(l.vi)}</span>` : ""}</button>`).join("")}</div></section>`).join("");
+  return top + `<div class="wrap"><div class="d-body"><div class="d-head"><div class="rd-kicker">Câu tiếng Trung</div><h2>Hội thoại mẫu</h2></div>${chips}
+    <p class="note" style="margin:0">Chạm vào một câu để phóng to cho người đối diện xem.</p>${scenes}</div></div>`;
+}
 function drawReader() {
   const el = $("#rd");
-  if (rdObs) { rdObs.disconnect(); rdObs = null; }
   if (!reader) { if (!el.hidden) { el.hidden = true; if (!detailId) document.body.style.overflow = ""; } return; }
-  const b = bookOf(reader.key), n = b.chapters.length;
-  if (reader.mode === "ch" && !n) reader.mode = "toc";
   let html;
-  if (reader.mode === "toc") {
-    html = `<div class="d-top rd-top"><div class="wrap"><button class="icon-btn" data-act="closeReader" aria-label="Đóng">${ICON_BACK}</button><span class="grow"></span></div></div>
-      <div class="wrap"><div class="d-body"><div class="d-head"><div class="rd-kicker">Hiểu nơi đây</div><h2>${esc(b.title)}</h2>${b.zh ? `<div class="zh">${esc(b.zh)}</div>` : ""}</div>
-      ${tocHtml(b)}${b.place ? `<div class="actions"><button class="btn small ghost" data-act="closeReader">← Về trang địa điểm</button></div>` : ""}</div></div>`;
-  } else {
-    const i = Math.max(0, Math.min(n - 1, reader.i)), c = b.chapters[i], nx = b.chapters[i + 1];
-    reader.i = i;
-    readPos = { ...readPos, [b.key]: i }; LS.set("readPos", readPos);
-    const kicker = [b.title, c.part && c.part !== c.title ? c.part : ""].filter(Boolean).join(" · ");
-    const end = nx
-      ? `<button class="next-card" data-act="readCh" data-key="${b.key}" data-i="${i + 1}" data-done="${i}"><span><small>Phần tiếp theo · ${i + 2}/${n}</small><b>${esc(chTitle(nx, i + 1))}</b></span><i>›</i></button>
-         <div class="row">${i > 0 ? `<button class="btn small ghost" data-act="readCh" data-key="${b.key}" data-i="${i - 1}">‹ Phần trước</button>` : ""}<button class="btn small ghost" data-act="readToc">☰ Mục lục</button></div>`
-      : `<div class="rd-done"><span>Bạn đã đọc tới phần cuối về ${esc(b.title)}.</span><span class="note">Đã đọc ${readCount(b)}/${n} phần. Phần nào chưa đọc vẫn để vòng trống trong mục lục.</span></div>
-         <div class="row">${i > 0 ? `<button class="btn small ghost" data-act="readCh" data-key="${b.key}" data-i="${i - 1}">‹ Phần trước</button>` : ""}<button class="btn small" data-act="readToc">☰ Mục lục</button><button class="btn small ghost" data-act="closeReader">${b.place ? "Về trang địa điểm" : "Đóng"}</button></div>`;
-    html = `<div class="d-top rd-top"><div class="wrap"><button class="btn small ghost" data-act="readToc">‹ Mục lục</button><span class="grow"></span><span class="rd-count">${i + 1} / ${n}</span><button class="icon-btn" data-act="closeReader" aria-label="Đóng" style="font-size:24px">×</button></div>
-      <div class="rd-prog"><i style="width:${Math.round(((i + 1) / n) * 100)}%"></i></div></div>
-      <div class="wrap"><div class="d-body rd-ch"><div><div class="rd-kicker">${esc(kicker)}</div><h2>${esc(chTitle(c, i))}</h2></div>
-      ${prose(c.body)}<div class="rd-end">${end}</div></div></div>`;
+  if (reader.mode === "dlg") html = dialogsHtml();
+  else {
+    const b = bookOf(reader.key), n = b.chapters.length;
+    if (reader.mode === "ch" && !n) reader.mode = "toc";
+    if (reader.mode === "toc") {
+      html = `<div class="d-top rd-top"><div class="wrap"><button class="icon-btn" data-act="closeReader" aria-label="Đóng">${ICON_BACK}</button><span class="grow"></span></div></div>
+        <div class="wrap"><div class="d-body"><div class="d-head"><div class="rd-kicker">Hiểu nơi đây</div><h2>${esc(b.title)}</h2>${b.zh ? `<div class="zh">${esc(b.zh)}</div>` : ""}</div>
+        ${tocHtml(b)}${b.place ? `<div class="actions"><button class="btn small ghost" data-act="closeReader">← Về trang địa điểm</button></div>` : ""}</div></div>`;
+    } else {
+      const i = Math.max(0, Math.min(n - 1, reader.i)), c = b.chapters[i], nx = b.chapters[i + 1];
+      reader.i = i;
+      const kicker = [b.title, c.part && c.part !== c.title ? c.part : ""].filter(Boolean).join(" · ");
+      const prev = i > 0 ? `<button class="btn small ghost" data-act="readCh" data-key="${b.key}" data-i="${i - 1}">‹ Phần trước</button>` : "";
+      const end = nx
+        ? `<button class="next-card" data-act="readCh" data-key="${b.key}" data-i="${i + 1}"><span><small>Phần tiếp theo</small><b>${esc(chTitle(nx, i + 1))}</b></span><i>›</i></button>
+           <div class="row">${prev}<button class="btn small ghost" data-act="readToc">☰ Mục lục</button></div>`
+        : `<div class="rd-done"><span>Hết bài về ${esc(b.title)}.</span></div>
+           <div class="row">${prev}<button class="btn small" data-act="readToc">☰ Mục lục</button><button class="btn small ghost" data-act="closeReader">${b.place ? "Về trang địa điểm" : "Đóng"}</button></div>`;
+      html = `<div class="d-top rd-top"><div class="wrap"><button class="btn small ghost" data-act="readToc">‹ Mục lục</button><span class="grow"></span><span class="rd-count">${i + 1} / ${n}</span><button class="icon-btn" data-act="closeReader" aria-label="Đóng" style="font-size:24px">×</button></div></div>
+        <div class="wrap"><div class="d-body rd-ch"><div><div class="rd-kicker">${esc(kicker)}</div><h2>${esc(chTitle(c, i))}</h2></div>
+        ${prose(c.body)}<div class="rd-end">${end}</div></div></div>`;
+    }
   }
   el.innerHTML = html;
   vnWrap(el);
   el.hidden = false; el.scrollTop = 0; document.body.style.overflow = "hidden";
-  // reaching the end of a part counts as read
-  const endEl = el.querySelector(".rd-end");
-  if (endEl && "IntersectionObserver" in window) {
-    const key = reader.key, i = reader.i;
-    rdObs = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { markRead(key, i); rdObs && rdObs.disconnect(); } }, { root: el });
-    rdObs.observe(endEl);
-  }
 }
 function closeReader() { reader = null; drawReader(); if (detailId) renderDetail(); else render(); }
+
+/* ---------- info tab ---------- */
+const grpHead = (n, title, sub, cls) => `<header class="grp stamp ${cls}"><span class="grp-n">${n}</span><div><h2>${title}</h2><p>${sub}</p></div></header>`;
+function bookingsSec() {
+  const bs = D.info.bookings.slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+  if (!bs.length) return `<section class="sec"><div class="sec-h"><h2>Khách sạn & di chuyển</h2></div><div class="empty"><span>Chưa có. Thêm trong thong-tin.md.</span></div></section>`;
+  return `<section class="sec"><div class="sec-h"><h2>Khách sạn & di chuyển</h2></div><div class="bk-list">${bs.map((b) => {
+    const dt = parseD(b.date);
+    return `<details class="bk-row"><summary><span class="bk-ico">${BK_ICON[b.kind] || BK_ICON.other}</span><span class="bk-t"><b>${esc(b.title)}</b><span>${BK[b.kind] || "Khác"}${dt ? ` · ${DOW[dt.getDay()]} ${ddmm(dt)}` : ""}${b.time ? ` · ${esc(b.time)}` : ""}</span></span><span class="chev">›</span></summary>
+      <div class="bk-more">${b.addrZh ? `<div class="zh">${esc(b.addrZh)}</div><div class="actions"><button class="btn small lilac" data-act="showText" data-v="${esc(b.addrZh)}" data-sub="${esc(b.title)}">Đưa tài xế xem</button><button class="btn small ghost" data-act="amapAddr" data-v="${esc(b.addrZh)}" data-sub="${esc(b.title)}">Mở Amap</button><button class="btn small ghost" data-act="copy" data-v="${esc(b.addrZh)}">Sao chép</button></div>` : ""}${b.detail ? prose(b.detail) : ""}</div></details>`;
+  }).join("")}</div></section>`;
+}
+function tipsSec() {
+  const T = D.info.tips || [];
+  if (!T.length) return "";
+  const gi = Math.min(ui.tipG || 0, T.length - 1), g = T[gi];
+  return `<section class="sec"><div class="sec-h"><h2>Lưu ý khi đi Trung Quốc</h2></div>
+    <div class="chips" role="group" aria-label="Nhóm lưu ý">${T.map((x, i) => `<button class="chip tipchip" data-act="tipG" data-i="${i}" aria-pressed="${i === gi}">${esc((x.icon ? x.icon + " " : "") + x.title)}<small>${x.items.length}</small></button>`).join("")}</div>
+    <div class="tips">${g.items.map((t, k) => `<article class="tip t${k % 3}"><div class="tip-h"><span class="tip-ico">${esc(t.icon || g.icon || "•")}</span><h3>${esc(t.title)}</h3></div>
+      ${t.big ? `<div class="tip-big"><b>${esc(t.big)}</b>${t.cap ? `<span>${esc(t.cap)}</span>` : ""}</div>` : ""}${t.body ? prose(t.body) : ""}${t.tag ? `<span class="tip-tag">⚠ ${esc(t.tag)}</span>` : ""}</article>`).join("")}</div></section>`;
+}
 function viewInfo() {
-  const I = D.info;
-  const hs = I.bookings.filter((b) => b.kind === "hotel").sort((a, b) => (a.date || "").localeCompare(b.date || "")), others = I.bookings.filter((b) => b.kind !== "hotel");
-  const bk = `<section class="sec"><div class="sec-h"><h2>Khách sạn & vé</h2></div>${I.bookings.length ? `<div class="list">${hs.length ? hotelCard(hs) : ""}${others.map(bkCard).join("")}</div>` : '<div class="empty"><span>Chưa có. Thêm trong thong-tin.md.</span></div>'}</section>`;
-  const ck = I.checklist, ckd = ck.filter(ckDone).length;
-  const cks = `<section class="sec"><div class="sec-h"><h2>Chuẩn bị trước khi đi</h2><span class="tag">${ckd}/${ck.length}</span></div>
-    <div class="ck">${ck.map((c, i) => `<div class="ck-row ${ckDone(c) ? "on" : ""}"><button data-act="toggleCk" data-i="${i}" aria-pressed="${ckDone(c)}"><span class="box">${ICON_CHECK}</span><span class="txt">${esc(c.text)}</span></button></div>`).join("")}</div></section>`;
-  const notes = I.notes ? `<section class="sec"><div class="sec-h"><h2>Ghi chú</h2></div><div class="card">${prose(I.notes)}</div></section>` : "";
+  const I = D.info, nd = (I.dialogs || []).length;
   const ph = `<section class="sec"><div class="sec-h"><h2>Câu tiếng Trung hay dùng</h2></div><p class="note" style="margin-top:-6px">Chạm để phóng to cho người bán hàng hoặc tài xế xem.</p>
-    <div class="phrases">${PHRASES.map((p, i) => `<button class="phrase" data-act="showPhrase" data-i="${i}"><span class="zh">${p[0]}</span><small>${p[1]}</small><span>${p[2]}</span></button>`).join("")}</div></section>`;
+    <div class="phrases">${PHRASES.map((p, i) => `<button class="phrase" data-act="showPhrase" data-i="${i}"><span class="zh">${p[0]}</span><small>${p[1]}</small><span>${p[2]}</span></button>`).join("")}</div>
+    <button class="btn lilac dlg-btn" data-act="openDialogs">💬 Hội thoại mẫu theo tình huống${nd ? ` · ${nd}` : " · sắp có"}</button></section>`;
   const sos = `<section class="sec"><div class="sec-h"><h2>Số khẩn cấp ở Trung Quốc</h2></div><div class="sos"><div><b>110</b><span>Cảnh sát</span></div><div><b>120</b><span>Cấp cứu</span></div><div><b>119</b><span>Cứu hoả</span></div></div></section>`;
   const rate = `<section class="sec"><div class="sec-h"><h2>Tỷ giá</h2></div><div class="card"><div class="money"><b>¥100</b><span>≈ ${fmtNum(Math.round(100 * (I.rate || 3650)))} ₫</span></div><span class="meta">1 ¥ = ${fmtNum(I.rate || 3650)} ₫</span></div></section>`;
-  return `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>` + bk + learnCard() + cks + notes + ph + rate + sos;
+  const offl = `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>`;
+  return grpHead(1, "Thông tin điểm đến", "Hiểu về hai thành phố và từng địa điểm", "dest") + learnCard()
+    + grpHead(2, "Thông tin du lịch", "Khách sạn, di chuyển, lưu ý và câu cần dùng", "trav")
+    + bookingsSec() + tipsSec() + ph + rate + sos + offl;
 }
 
 /* ---------- detail ---------- */
@@ -1403,7 +1490,13 @@ document.addEventListener("click", (e) => {
     case "amap": { const p = PL[id]; if (p) openAmap(p); break; }
     case "closeDetail": closeDetail(); break;
     case "openBook": reader = { key: el.dataset.key, i: 0, mode: "toc" }; drawReader(); break;
-    case "readCh": if (el.dataset.done) markRead(el.dataset.key, +el.dataset.done); reader = { key: el.dataset.key, i: +el.dataset.i, mode: "ch" }; drawReader(); break;
+    case "readCh": reader = { key: el.dataset.key, i: +el.dataset.i, mode: "ch" }; drawReader(); break;
+    case "openDialogs": reader = { mode: "dlg", g: 0 }; drawReader(); break;
+    case "dlgG": reader.g = +el.dataset.i; drawReader(); break;
+    case "dlgLine": { const g = (D.info.dialogs || [])[reader.g || 0], l = g && g.scenes[+el.dataset.s] && g.scenes[+el.dataset.s].lines[+el.dataset.l]; if (l) show(l.zh, l.py, l.vi); break; }
+    case "tipG": ui.tipG = +el.dataset.i; render(); break;
+    case "amapAddr": { const v = el.dataset.v; openAmap({ name: el.dataset.sub, addrZh: v, city: v.includes("上海") ? "sh" : "hz" }); break; }
+    case "homeFullMap": Object.assign(ui, { tab: "places", pcity: meCity(), view: "map", route: "", mapSel: null }); try { history.replaceState(null, "", "#places"); } catch (e) {} render(); window.scrollTo(0, 0); break;
     case "readToc": reader.mode = "toc"; drawReader(); break;
     case "closeReader": closeReader(); break;
     case "learnPlace": openPlace(id); detailMode = "learn"; renderDetail(); $("#detail").scrollTop = 0; break;
