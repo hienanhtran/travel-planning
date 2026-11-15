@@ -714,7 +714,10 @@ const CITY_ZH = { sh: "上海", hz: "杭州" };
 // Search keyword for map apps: Chinese name with the city in front (best POI match), else the Chinese address
 const mapQuery = (p) => (p.zh ? `${CITY_ZH[p.city] ? CITY_ZH[p.city] + " " : ""}${p.zh}` : p.addrZh || p.name);
 // A hand-set pin ("Tọa độ:" line, GCJ-02) opens Amap right on that point; otherwise search by name
-const amapAppUrl = (p) => (p.loc && p.locSrc === "tay"
+// An Amap share link in 'Link:' gives the shop's POI id: open its own page (rating, hours, photos)
+const amapAppUrl = (p) => (p.poi
+  ? `iosamap://viewPOIDetail?sourceApplication=sotay&poiId=${p.poi}&poiname=${encodeURIComponent(p.zh || p.name)}${p.loc ? `&lat=${p.loc[0]}&lon=${p.loc[1]}` : ""}&dev=0`
+  : p.loc && p.locSrc === "tay"
   ? `iosamap://viewMap?sourceApplication=sotay&poiname=${encodeURIComponent(p.zh || p.name)}&lat=${p.loc[0]}&lon=${p.loc[1]}&dev=0`
   : `iosamap://poi?sourceApplication=sotay&name=${encodeURIComponent(mapQuery(p))}&dev=0`);
 const appleMapUrl = (p) => `maps://?q=${encodeURIComponent(p.addrZh || mapQuery(p))}`;
