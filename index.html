@@ -1409,7 +1409,7 @@ function tocHtml(b) {
 const ICON_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
 /* ---------- tab "Tiếng Trung": từ cơ bản · đếm số · hội thoại ---------- */
 const TK = () => (D && D.info.talk) || { words: [], nums: [], dialogs: [] };
-const tk = { sub: null, wg: -1, ns: "learn", ng: 0, dg: -1, ds: -1, nin: "350", qz: null, od: { i: 0, q: 2 } };
+const tk = { dq: "", sub: null, wg: -1, ns: "learn", ng: 0, dg: -1, ds: -1, nin: "350", qz: null, od: { i: 0, q: 2 } };
 const canSpeak = () => "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
 function speak(t) {
   if (!canSpeak()) { toast("Máy này chưa hỗ trợ đọc tiếng Trung."); return; }
@@ -1535,10 +1535,24 @@ function wordsView() {
   return chips + `<p class="note" style="margin:0">Chạm vào chữ để phóng to cho người đối diện xem; chạm 🔊 để nghe phát âm.</p>` +
     W.map((g, i) => [g, i]).filter(([, i]) => gi < 0 || i === gi).map(([g, i]) => `<section class="sec"><div class="sec-h"><h2>${esc(g.icon + " " + g.title)}</h2><span class="meta">${g.items.length} mục</span></div><div class="wds">${g.items.map((it, k) => row(it, i, k)).join("")}</div></section>`).join("");
 }
+function sceneHtml(sc, g, s, c, open, tag) {
+  return `<details class="scn" ${open ? "open" : ""}><summary><span class="scn-n">${tag || c + 1}</span><span class="scn-t"><b>${esc(sc.title)}</b><span>${esc(sc.lines[0] ? sc.lines[0].zh : "")}</span></span><span class="chev">›</span></summary>
+    ${sc.note ? prose(sc.note) : ""}<div class="chat">${sc.lines.map((l, li) => `<button class="bub ${l.me ? "me" : ""}" data-act="dlgLine" data-g="${g}" data-s="${s}" data-c="${c}" data-l="${li}"><small>${esc(l.who)}</small><span class="zh">${esc(l.zh)}</span>${l.py ? `<i>${esc(l.py)}</i>` : ""}${l.vi ? `<span>${esc(l.vi)}</span>` : ""}</button>`).join("")}</div></details>`;
+}
+function dlgSearchHtml(q) {
+  const words = fold(q).split(/\s+/).filter(Boolean);
+  if (!words.length) return "";
+  const out = [];
+  TK().dialogs.forEach((g, gi) => g.sections.forEach((s, si) => s.scenes.forEach((sc, ci) => {
+    const t = fold([sc.title, sc.lines.map((l) => l.zh + " " + l.py + " " + l.vi).join(" ")].join(" "));
+    if (words.every((w) => t.includes(w))) out.push(`<div class="meta" style="margin:8px 0 4px">${esc(g.icon + " " + g.title + " · " + s.title)}</div>` + sceneHtml(sc, gi, si, ci, false, "›"));
+  })));
+  return out.length ? `<p class="meta" style="margin:0">${out.length} mẩu khớp</p>${out.slice(0, 40).join("")}` : `<div class="empty"><b>Không thấy mẩu nào</b><span>Thử từ khoá ngắn hơn, tiếng Việt, pinyin hoặc chữ Hán.</span></div>`;
+}
 function dialogsView() {
   const G = TK().dialogs;
   if (tk.dg < 0 || !G[tk.dg]) {
-    return `<div class="tk-grid">${G.map((g, i) => { const n = g.sections.reduce((s, x) => s + x.scenes.length, 0); return `<button class="dg-card c${i % 4}" data-act="dlgOpen" data-i="${i}"><span class="dg-ico">${esc(g.icon)}</span><span class="dg-t"><b>${esc(g.title)}</b><span>${n} mẩu · ${esc(g.sections.map((s) => s.title).join(", "))}</span></span><span class="chev">›</span></button>`; }).join("")}</div>`;
+    return `<input id="dlgQ" type="search" placeholder="Tìm mẩu: gõ tiếng Việt, pinyin hoặc chữ Hán…" autocomplete="off" value="${esc(tk.dq || "")}" aria-label="Tìm hội thoại"><div id="dlgRes">${dlgSearchHtml(tk.dq || "")}</div><div class="tk-grid" id="dlgGrid" ${tk.dq ? "hidden" : ""}>${G.map((g, i) => { const n = g.sections.reduce((s, x) => s + x.scenes.length, 0); return `<button class="dg-card c${i % 4}" data-act="dlgOpen" data-i="${i}"><span class="dg-ico">${esc(g.icon)}</span><span class="dg-t"><b>${esc(g.title)}</b><span>${n} mẩu · ${esc(g.sections.map((s) => s.title).join(", "))}</span></span><span class="chev">›</span></button>`; }).join("")}</div>`;
   }
   const g = G[tk.dg], si = tk.ds;
   const chips = `<div class="chips"><button class="chip" data-act="dlgS" data-i="-1" aria-pressed="${si < 0}">Tất cả</button>${g.sections.map((s, i) => `<button class="chip" data-act="dlgS" data-i="${i}" aria-pressed="${i === si}">${esc(s.icon + " " + s.title)} · ${s.scenes.length}</button>`).join("")}</div>`;
@@ -1546,8 +1560,7 @@ function dialogsView() {
     <header class="tip-hero stamp"><span class="tip-hero-ico">${esc(g.icon)}</span><div><h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p></div></header>${chips}
     <p class="note" style="margin:0">Chạm một mẩu để mở. Chạm vào câu để phóng to và nghe.</p>
     ${g.sections.map((s, i) => [s, i]).filter(([, i]) => si < 0 || i === si).map(([s, i]) => `<section class="sec"><div class="sec-h"><h2>${esc(s.icon + " " + s.title)}</h2><span class="meta">${s.scenes.length} mẩu</span></div>
-      ${s.scenes.map((sc, c) => `<details class="scn"><summary><span class="scn-n">${c + 1}</span><span class="scn-t"><b>${esc(sc.title)}</b><span>${esc(sc.lines[0] ? sc.lines[0].zh : "")}</span></span><span class="chev">›</span></summary>
-        ${sc.note ? prose(sc.note) : ""}<div class="chat">${sc.lines.map((l, li) => `<button class="bub ${l.me ? "me" : ""}" data-act="dlgLine" data-g="${tk.dg}" data-s="${i}" data-c="${c}" data-l="${li}"><small>${esc(l.who)}</small><span class="zh">${esc(l.zh)}</span>${l.py ? `<i>${esc(l.py)}</i>` : ""}${l.vi ? `<span>${esc(l.vi)}</span>` : ""}</button>`).join("")}</div></details>`).join("")}</section>`).join("")}`;
+      ${s.scenes.map((sc, c) => sceneHtml(sc, tk.dg, i, c, false)).join("")}</section>`).join("")}`;
 }
 function viewTalk() {
   const T = TK(), nw = T.words.reduce((n, g) => n + g.items.length, 0), nd = T.dialogs.reduce((n, g) => n + g.sections.reduce((s, x) => s + x.scenes.length, 0), 0);
@@ -1555,7 +1568,7 @@ function viewTalk() {
     return `<div class="tk-hub"><p class="note" style="margin:0">Học nhanh để nghe và nói được những tình huống thường gặp. Chọn một mục:</p>
       <button class="tk-card stamp a" data-act="tkOpen" data-v="words"><span class="tk-n">1</span><span class="tk-t"><b>Từ cơ bản</b><span>${nw} từ và cụm từ cần nhất, chia theo nhóm</span></span><span class="chev">›</span></button>
       <button class="tk-card stamp b" data-act="tkOpen" data-v="nums"><span class="tk-n">2</span><span class="tk-t"><b>Cách đếm số</b><span>Nghe và nói số tiền 1–1000 tệ, gọi món theo số lượng</span></span><span class="chev">›</span></button>
-      <button class="tk-card stamp c" data-act="tkOpen" data-v="dlg"><span class="tk-n">3</span><span class="tk-t"><b>Hội thoại điển hình</b><span>${nd} mẩu: di chuyển, ăn uống, cà phê – trà sữa, hỏi đường</span></span><span class="chev">›</span></button></div>`;
+      <button class="tk-card stamp c" data-act="tkOpen" data-v="dlg"><span class="tk-n">3</span><span class="tk-t"><b>Hội thoại điển hình</b><span>${nd} mẩu trong ${T.dialogs.length} nhóm: di chuyển, ăn uống, khách sạn, mua sắm, hỏi đường, làm quen…</span></span><span class="chev">›</span></button></div>`;
   }
   const meta = { words: ["Từ cơ bản", wordsView], nums: ["Cách đếm số", numsView], dlg: ["Hội thoại điển hình", dialogsView] }[tk.sub];
   return `<div class="tk-page"><div class="tk-sub"><button class="btn small ghost" data-act="tkBack">‹ Tiếng Trung</button><h2>${meta[0]}</h2></div>${meta[1]()}</div>`;
@@ -1851,7 +1864,8 @@ function drawSearch(q) {
 window.addEventListener("scroll", () => { const b = $("#totop"), h = window.scrollY < 900; if (b && b.hidden !== h) b.hidden = h; }, { passive: true });
 
 /* ---------- events ---------- */
-document.addEventListener("input", (e) => { if (e.target && e.target.id === "numIn") { tk.nin = e.target.value; $("#numOut").innerHTML = numResultHtml(tk.nin); } });
+document.addEventListener("input", (e) => { if (e.target && e.target.id === "dlgQ") { tk.dq = e.target.value; $("#dlgRes").innerHTML = dlgSearchHtml(tk.dq); $("#dlgGrid").hidden = !!tk.dq.trim(); return; }
+  if (e.target && e.target.id === "numIn") { tk.nin = e.target.value; $("#numOut").innerHTML = numResultHtml(tk.nin); } });
 function setTab(t) { ui.tab = t; if (t === "places") { ui.pcity = null; ui.route = ""; ui.mapSel = null; } try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo(0, 0); }
 document.addEventListener("click", (e) => {
   const tabEl = e.target.closest("[data-tab]");
