@@ -580,6 +580,13 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 .bk-row[open] .chev{transform:rotate(90deg)}
 .bk-more{display:flex;flex-direction:column;gap:8px;padding:0 14px 14px 66px}
 .bk-more .zh{font-size:17px;font-weight:700}
+.pl{display:flex;flex-direction:column;gap:10px}
+.pl-item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;background:var(--surface);border:1.5px solid var(--line)}
+.pl-ico{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--hero2-bg);color:var(--hero2-ink);font-size:20px}
+.pl-t{min-width:0;flex:1;display:flex;flex-direction:column}
+.pl-t b{font-size:16px;line-height:1.3}
+.pl-t span{font-size:12px;font-weight:600;color:var(--ink-soft)}
+.pl-t .prose{font-size:13px;margin-top:4px}
 .tips{display:flex;flex-direction:column;gap:10px}
 .tip{border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:var(--pc-bg);color:var(--pc-ink)}
 .tip.t1{background:var(--pc2-bg);color:var(--pc2-ink)}
@@ -1372,6 +1379,12 @@ function tipsSec() {
     <div class="tips">${g.items.map((t, k) => `<article class="tip t${k % 3}"><div class="tip-h"><span class="tip-ico">${esc(t.icon || g.icon || "•")}</span><h3>${esc(t.title)}</h3></div>
       ${t.big ? `<div class="tip-big"><b>${esc(t.big)}</b>${t.cap ? `<span>${esc(t.cap)}</span>` : ""}</div>` : ""}${t.body ? prose(t.body) : ""}${t.tag ? `<span class="tip-tag">⚠ ${esc(t.tag)}</span>` : ""}</article>`).join("")}</div></section>`;
 }
+function playlistSec() {
+  const L = D.info.playlist || [];
+  const body = L.length ? `<div class="pl">${L.map((t) => `<div class="pl-item"><span class="pl-ico">🎵</span><div class="pl-t"><b>${esc(t.title)}</b>${t.artist ? `<span>${esc(t.artist)}</span>` : ""}${t.note ? prose(t.note) : ""}</div>${t.url ? `<a class="btn small lilac" href="${esc(safeUrl(t.url))}" target="_blank" rel="noopener">▶ YouTube</a>` : ""}</div>`).join("")}</div>`
+    : `<div class="empty"><span>Chưa có bài nào. Thêm trong du-lieu/playlist.md.</span></div>`;
+  return grpHead(3, "Playlist", "Nhạc nghe trên đường đi", "play") + `<section class="sec"><div class="sec-h"><h2>Bài hát</h2></div>${body}</section>`;
+}
 function viewInfo() {
   const I = D.info, nd = (I.dialogs || []).length;
   const ph = `<section class="sec"><div class="sec-h"><h2>Câu tiếng Trung hay dùng</h2></div><p class="note" style="margin-top:-6px">Chạm để phóng to cho người bán hàng hoặc tài xế xem.</p>
@@ -1382,7 +1395,7 @@ function viewInfo() {
   const offl = `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>`;
   return grpHead(1, "Thông tin điểm đến", "Hiểu về hai thành phố và từng địa điểm", "dest") + learnCard()
     + grpHead(2, "Thông tin du lịch", "Khách sạn, di chuyển, lưu ý và câu cần dùng", "trav")
-    + bookingsSec() + tipsSec() + ph + rate + sos + offl;
+    + bookingsSec() + tipsSec() + ph + rate + sos + offl + playlistSec();
 }
 
 /* ---------- detail ---------- */
