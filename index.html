@@ -244,7 +244,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 
 /* bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 4px}
+.nav-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px}
 .nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:11px;font-weight:700;color:var(--ink-soft);min-height:56px}
 .nav button i{display:grid;place-items:center;width:52px;height:30px;border-radius:99px}
 .nav button svg{width:22px;height:22px}
@@ -320,6 +320,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .pimgs.n2{grid-template-columns:1fr 1fr}
 .pimgs button{border:0;padding:0;background:var(--surface-2);border-radius:14px;overflow:hidden;aspect-ratio:4/3}
 .pimgs.n1 button{aspect-ratio:16/10}
+.stop-note{white-space:normal;display:flex;flex-direction:column;gap:6px}
+.stop-note p{margin:0}
+.stop-note .pimgs button,.stop-note .pimgs.n1 button{aspect-ratio:3/4}
+.stop-note .pimgs.n1{max-width:62%}
 .pimgs img{width:100%;height:100%;object-fit:cover;display:block}
 .prose blockquote{margin:2px 0;padding:10px 14px;border-left:4px solid var(--line);background:var(--surface-2);border-radius:0 12px 12px 0;font-size:16px;line-height:1.7}
 .d-mode{position:sticky;top:64px;z-index:3;box-shadow:var(--shadow)}
@@ -623,6 +627,70 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 .bub i{font-size:13px;color:var(--ink-soft)}
 .bub span:last-child{font-size:14px}
 .dlg h3{margin:6px 0 2px;font-family:var(--f-display);font-weight:800;font-size:18px}
+/* tab Tiếng Trung */
+.tk-hub{display:flex;flex-direction:column;gap:14px}
+.tk-card{display:flex;gap:14px;align-items:center;width:100%;padding:20px 18px;text-align:left;border:0;background:var(--hero-bg);color:var(--hero-ink);font:inherit}
+.tk-card.b{--hero-bg:var(--hero2-bg);--hero-ink:var(--hero2-ink);--hero-num:var(--hero2-num);--hero-num-ink:var(--hero2-num-ink)}
+.tk-card.c{--hero-bg:var(--pc-bg);--hero-ink:var(--pc-ink);--hero-num:var(--pc-btn);--hero-num-ink:var(--pc-btn-ink)}
+.tk-n{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--hero-num);color:var(--hero-num-ink);font-family:var(--f-display);font-weight:800;font-size:24px}
+.tk-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.tk-t b{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.15}
+.tk-t span{font-size:13px;font-weight:600;opacity:.88;line-height:1.4}
+.tk-card .chev{font-size:26px;font-weight:800;opacity:.8}
+.tk-page{display:flex;flex-direction:column;gap:12px}
+.tk-sub{display:flex;align-items:center;gap:12px}
+.tk-sub h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:22px}
+.wds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wd{display:flex;align-items:stretch;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;min-width:0;overflow:hidden}
+.wd-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;background:none;border:0;padding:10px 4px 10px 12px;color:var(--ink);font:inherit}
+.wd-main .zh{font-size:18px;font-weight:700;color:var(--lilac-deep);overflow-wrap:anywhere}
+.wd-main small{font-size:12px;color:var(--ink-soft);overflow-wrap:anywhere}
+.wd-main span:last-child{font-size:13px;font-weight:600}
+.wd-say{flex:none;width:38px;height:auto;font-size:16px;align-self:center}
+@media (max-width:420px){.wds{grid-template-columns:1fr}}
+.tk-box{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:20px;background:var(--surface);border:1.5px solid var(--line)}
+.tk-box h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:19px}
+.nr-zh{font-family:var(--f-zh);font-weight:800;font-size:clamp(28px,9vw,40px);line-height:1.2;color:var(--lilac-deep);overflow-wrap:anywhere}
+.nr-zh.sm{font-size:24px}
+.nr-py{font-size:15px;color:var(--ink-soft);font-weight:600}
+.nr-box{display:flex;flex-direction:column;gap:8px}
+.ntiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ntile{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px;border-radius:16px;background:var(--surface);border:1.5px solid var(--line);color:var(--ink);font:inherit;min-width:0}
+.ntile b{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.1}
+.ntile .zh{font-size:17px;font-weight:700;color:var(--lilac-deep)}
+.ntile small{font-size:11px;color:var(--ink-soft);text-align:center}
+.qz-say{width:100%;justify-content:center;min-height:56px;font-size:17px}
+.qz-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qz-opt{min-height:54px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:20px}
+.qz-opt.ok{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
+.qz-opt.bad{background:var(--warn-bg);border-color:var(--warn-ink);color:var(--warn-ink)}
+.qz-res{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.od-q{display:flex;align-items:center;gap:14px}
+.od-q b{font-family:var(--f-display);font-weight:800;font-size:28px;min-width:36px;text-align:center}
+.od-q .icon-btn{width:44px;height:44px;font-size:24px;border:1.5px solid var(--line);border-radius:50%;background:var(--surface-2)}
+.tk-grid{display:flex;flex-direction:column;gap:12px}
+.dg-card{display:flex;gap:14px;align-items:center;width:100%;padding:16px;border-radius:22px;text-align:left;border:0;font:inherit;background:var(--pc-bg);color:var(--pc-ink)}
+.dg-card.c1{background:var(--pc2-bg);color:var(--pc2-ink)}
+.dg-card.c2{background:var(--lilac-soft);color:var(--ink)}
+.dg-card.c3{background:var(--surface-2);color:var(--ink)}
+.dg-ico{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--surface);font-size:26px;box-shadow:var(--shadow)}
+.dg-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dg-t b{font-family:var(--f-display);font-weight:800;font-size:20px}
+.dg-t span{font-size:13px;font-weight:600;opacity:.85;line-height:1.35}
+.dg-card .chev{font-size:24px;font-weight:800}
+.scn{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;margin-bottom:8px;overflow:hidden}
+.scn summary{list-style:none;display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:10px 14px;cursor:pointer;min-height:52px}
+.scn summary::-webkit-details-marker{display:none}
+.scn-n{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--lilac-soft);color:var(--lilac-deep);font-weight:800;font-size:14px}
+.scn-t{min-width:0;display:flex;flex-direction:column}
+.scn-t b{font-size:15px;line-height:1.3}
+.scn-t span{font-size:13px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scn .chev{color:var(--ink-soft);font-weight:800;transition:transform .15s}
+.scn[open] .chev{transform:rotate(90deg)}
+.scn[open] summary{border-bottom:1px solid var(--line)}
+.scn .chat,.scn .prose{padding:12px 14px}
+.scn .prose{padding-bottom:0;font-size:13px}
+.say-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:99px;background:var(--lilac);color:#1E0F38;font-weight:700;font-size:16px;margin-top:6px}
 /* reader: plain table of contents */
 .toc-row{grid-template-columns:1fr auto!important}
 .toc-row .chev{color:var(--ink-soft);font-weight:800;align-self:center}
@@ -695,6 +763,7 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
     <button data-tab="home"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a2 2 0 0 1-2 2h-3v-6H9v6H6a2 2 0 0 1-2-2z"/></svg></i>Tổng quan</button>
     <button data-tab="places"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i>Địa điểm</button>
     <button data-tab="plan"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg></i>Lịch trình</button>
+    <button data-tab="talk"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M19 9h1a1 1 0 0 1 1 1v8l-3-2h-5"/></svg></i>Tiếng Trung</button>
     <button data-tab="info"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4z"/><path d="M14 5v14" stroke-dasharray="2 2.5"/></svg></i>Thông tin</button>
   </div>
 </nav>
@@ -717,16 +786,6 @@ const CATS = { eat: "Ăn uống", cafe: "Cà phê & trà", shop: "Mua sắm", se
 const OTHER_CITY = { sh: "hz", hz: "sh" };
 const BK = { flight: "Chuyến bay", hotel: "Khách sạn", train: "Tàu cao tốc", other: "Khác" };
 const STATUS = { idea: "Ý tưởng – chưa tìm hiểu", check: "Đã nghiên cứu – cần kiểm tra lại", ok: "Đã xác nhận" };
-const PHRASES = [
-  ["你好", "nǐ hǎo", "Xin chào"],
-  ["谢谢", "xièxie", "Cảm ơn"],
-  ["多少钱？", "duōshao qián", "Bao nhiêu tiền?"],
-  ["请带我去这个地址", "qǐng dài wǒ qù zhège dìzhǐ", "Cho tôi đến địa chỉ này"],
-  ["洗手间在哪里？", "xǐshǒujiān zài nǎlǐ", "Nhà vệ sinh ở đâu?"],
-  ["不要辣", "bú yào là", "Không cay"],
-  ["可以用支付宝吗？", "kěyǐ yòng zhīfùbǎo ma", "Trả bằng Alipay được không?"],
-  ["我不会说中文", "wǒ bú huì shuō zhōngwén", "Tôi không nói được tiếng Trung"],
-];
 const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const BK_ICON = {
   flight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5L3 11l1.5-1.5 8 .5 4-4a2 2 0 0 1 3 3l-4 4 .5 8L14.5 22 12 14.5"/></svg>',
@@ -803,12 +862,12 @@ function dayCity(i) { return [...new Set(planItems().filter((p) => p.day === i).
 const byTime = (a, b) => (a.time || "99").localeCompare(b.time || "99");
 
 /* ---------- render ---------- */
-const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", info: "Thông tin chuyến đi" };
+const TITLES = { home: "Tổng quan", places: "Địa điểm muốn đi", plan: "Lịch trình", talk: "Tiếng Trung giao tiếp", info: "Thông tin chuyến đi" };
 function render() {
   document.querySelectorAll(".nav button").forEach((b) => { if (b.dataset.tab === ui.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   $("#pageTitle span").textContent = TITLES[ui.tab];
   if (!D) return;
-  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, info: viewInfo })[ui.tab]();
+  $("#view").innerHTML = ({ home: viewHome, places: viewPlaces, plan: viewPlan, talk: viewTalk, info: viewInfo })[ui.tab]();
   vnWrap($("#view"));
   if (onMap() || (ui.tab === "home" && $("#mapSlot"))) attachMap(); else stopGeo();
   renderDetail();
@@ -921,7 +980,7 @@ function placeCard(p, o = {}) {
     <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${chain}${inside}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
     ${(o.img || placeImg(p)) ? `<button class="card-main" data-act="photo" data-v="${o.img || placeImg(p)}" aria-label="Xem ảnh ${esc(p.name)}"><img class="pc-img" src="${o.img || placeImg(p)}" alt="" loading="lazy"></button>` : ""}
-    ${o.stopNote ? `<p class="note"><b>Ở cung này:</b> ${esc(o.stopNote)}</p>` : ""}
+    ${o.stopNote ? `<div class="note stop-note"><b>Ở cung này:</b>${prose(o.stopNote)}</div>` : ""}
     ${p.note && !(o.stopNote && p.stopOf) ? `<p class="note">${rt(clip(p.note.split("\n")[0].replace(/!\[[^\]]*\]\([^)]*\)/g, "").trim(), 140)).replace(/\*\*/g, "")}</p>` : ""}
     <div class="actions">
       <button class="btn small lilac" data-act="openPlace" data-id="${p.id}">Xem chi tiết</button>
@@ -1348,24 +1407,164 @@ function tocHtml(b) {
   return `<p class="meta" style="margin:0">${b.chapters.length} phần · ~${bookMins(b)} phút đọc</p><nav class="toc2" aria-label="Mục lục">${rows}</nav>`;
 }
 const ICON_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
-function dialogsHtml() {
-  const G = D.info.dialogs || [];
-  const top = `<div class="d-top rd-top"><div class="wrap"><button class="icon-btn" data-act="closeReader" aria-label="Đóng">${ICON_BACK}</button><span class="grow"></span></div></div>`;
-  if (!G.length) return top + `<div class="wrap"><div class="d-body"><div class="d-head"><div class="rd-kicker">Câu tiếng Trung</div><h2>Hội thoại mẫu</h2></div>
-    <div class="empty"><b>Chưa có hội thoại</b><span>Các mẩu hội thoại theo tình huống (gọi món, đi taxi, mua sắm…) sẽ được thêm sau, trong du-lieu/hoi-thoai.md.</span></div></div></div>`;
-  const gi = Math.min(reader.g || 0, G.length - 1), g = G[gi];
-  const chips = G.length > 1 ? `<div class="chips">${G.map((x, i) => `<button class="chip" data-act="dlgG" data-i="${i}" aria-pressed="${i === gi}">${esc((x.icon ? x.icon + " " : "") + x.title)}</button>`).join("")}</div>` : "";
-  const scenes = g.scenes.map((sc, si) => `<section class="dlg">${sc.title ? `<h3>${esc(sc.title)}</h3>` : ""}${sc.note ? prose(sc.note) : ""}
-    <div class="chat">${sc.lines.map((l, li) => `<button class="bub ${l.me ? "me" : ""}" data-act="dlgLine" data-s="${si}" data-l="${li}"><small>${esc(l.who)}</small><span class="zh">${esc(l.zh)}</span>${l.py ? `<i>${esc(l.py)}</i>` : ""}${l.vi ? `<span>${esc(l.vi)}</span>` : ""}</button>`).join("")}</div></section>`).join("");
-  return top + `<div class="wrap"><div class="d-body"><div class="d-head"><div class="rd-kicker">Câu tiếng Trung</div><h2>Hội thoại mẫu</h2></div>${chips}
-    <p class="note" style="margin:0">Chạm vào một câu để phóng to cho người đối diện xem.</p>${scenes}</div></div>`;
+/* ---------- tab "Tiếng Trung": từ cơ bản · đếm số · hội thoại ---------- */
+const TK = () => (D && D.info.talk) || { words: [], nums: [], dialogs: [] };
+const tk = { sub: null, wg: -1, ns: "learn", ng: 0, dg: -1, ds: -1, nin: "350", qz: null, od: { i: 0, q: 2 } };
+const canSpeak = () => "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
+function speak(t) {
+  if (!canSpeak()) { toast("Máy này chưa hỗ trợ đọc tiếng Trung."); return; }
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = "zh-CN"; u.rate = 0.8;
+    const v = speechSynthesis.getVoices().find((x) => /^zh[-_]CN/i.test(x.lang));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+/* --- numbers → Chinese + pinyin --- */
+const NH = "零一二三四五六七八九", NP = ["líng", "yī", "èr", "sān", "sì", "wǔ", "liù", "qī", "bā", "jiǔ"];
+const toneOf = (py) => { const m = py.match(/[āēīōūǖáéíóúǘǎěǐǒǔǚàèìòùǜ]/); if (!m) return 5; return "āēīōūǖ".includes(m[0]) ? 1 : "áéíóúǘ".includes(m[0]) ? 2 : "ǎěǐǒǔǚ".includes(m[0]) ? 3 : 4; };
+function intTok(n) {
+  const T = (h, p) => ({ h, p }), D1 = (d, l) => (l && d === 2 ? T("两", "liǎng") : T(NH[d], NP[d]));
+  if (n === 0) return [T("零", "líng")];
+  const th = Math.floor(n / 1000), h = Math.floor(n / 100) % 10, t = Math.floor(n / 10) % 10, o = n % 10, out = [];
+  let started = false, zero = false;
+  if (th) { out.push(D1(th, true), T("千", "qiān")); started = true; }
+  if (h) { if (zero) out.push(T("零", "líng")); out.push(D1(h, true), T("百", "bǎi")); started = true; zero = false; } else if (started) zero = true;
+  if (t) { if (zero) out.push(T("零", "líng")); if (!(t === 1 && !started)) out.push(D1(t, false)); out.push(T("十", "shí")); started = true; zero = false; } else if (started) zero = true;
+  if (o) { if (zero) out.push(T("零", "líng")); out.push(D1(o, false)); }
+  return out;
+}
+function fixYi(toks) { // 一 becomes yì / yí in front of another syllable
+  return toks.map((k, i) => (k.h === "一" && toks[i + 1] ? { h: k.h, p: toneOf(toks[i + 1].p) >= 4 ? "yí" : "yì" } : k));
+}
+const tokOut = (toks) => { const f = fixYi(toks); return { zh: f.map((k) => k.h).join(""), py: f.map((k) => k.p).join(" ") }; };
+function amountSay(txt) { // "350", "12.5" → { n, zh, py, short }
+  const m = String(txt).replace(",", ".").trim().match(/^(\d{1,4})(?:\.(\d))?$/);
+  if (!m) return null;
+  const n = +m[1], dec = m[2] ? +m[2] : 0;
+  if (n === 0 && !dec) return null;
+  let toks = n === 2 && !dec ? [{ h: "两", p: "liǎng" }] : n > 0 ? intTok(n) : [];
+  if (n === 0) toks = [dec === 2 ? { h: "两", p: "liǎng" } : { h: NH[dec], p: NP[dec] }, { h: "毛", p: "máo" }];
+  else { toks = toks.concat([{ h: "块", p: "kuài" }]); if (dec) toks = toks.concat([{ h: NH[dec], p: NP[dec] }]); }
+  const r = tokOut(toks);
+  let short = "";
+  if (!dec && n >= 110 && !intTok(n).some((k) => k.h === "零") && ((n % 10 === 0 && n % 100 !== 0) || (n % 100 === 0 && n % 1000 !== 0 && n >= 1100))) short = tokOut(intTok(n).slice(0, -1)).zh;
+  return { n, dec, zh: r.zh, py: r.py, short };
+}
+function numResultHtml(txt) {
+  const a = amountSay(txt);
+  if (!a) return `<p class="note">Gõ số từ 1 đến 9999 (có thể có một số lẻ sau dấu chấm, ví dụ 12.5).</p>`;
+  return `<div class="nr-zh">${esc(a.zh)}</div><div class="nr-py">${esc(a.py)}</div>
+    ${a.short ? `<p class="note" style="margin:0">Người bán hay nói tắt: <b>${esc(a.short)}</b> (bỏ chữ cuối cho gọn)</p>` : ""}
+    <div class="actions"><button class="btn lilac" data-act="say" data-v="${esc(a.zh)}">🔊 Nghe</button><button class="btn ghost" data-act="showText" data-v="${esc(a.zh)}" data-sub="¥ ${esc(txt)}">Đưa người bán xem</button></div>`;
+}
+/* --- quiz: listen & choose the amount --- */
+function newQuiz(keep) {
+  const r = Math.random();
+  let n, dec = 0;
+  if (r < 0.35) n = 1 + Math.floor(Math.random() * 99);
+  else if (r < 0.8) n = [5, 10][Math.floor(Math.random() * 2)] * (2 + Math.floor(Math.random() * 97));
+  else if (r < 0.9) n = 100 + Math.floor(Math.random() * 900);
+  else { n = 1 + Math.floor(Math.random() * 60); dec = 5; }
+  n = Math.min(n, 1000);
+  const val = (x) => (dec ? x + ".5" : String(x));
+  const opts = new Set([val(n)]);
+  const cands = [];
+  if (n >= 10 && n < 100) cands.push((n % 10) * 10 + Math.floor(n / 10));
+  if (n >= 100) { const s = String(n); cands.push(+(s[0] + "0" + s.slice(1)), +(s.slice(1) + s[0])); }
+  cands.push(n + 10, n - 10, n + 1, n - 1, n + 100, n + 5, n + 50, n - 5);
+  for (const c of cands) { if (opts.size >= 4) break; if (c >= 1 && c <= 1000 && c !== n) opts.add(val(c)); }
+  let k = 2; while (opts.size < 4) opts.add(val(n + k++ * 3));
+  const prev = tk.qz;
+  tk.qz = { v: val(n), opts: [...opts].sort(() => Math.random() - 0.5), pick: null, score: keep && prev ? prev.score : 0, total: keep && prev ? prev.total : 0, say: canSpeak() };
+}
+function quizHtml() {
+  const q = tk.qz;
+  if (!q) return `<section class="sec"><div class="tk-box"><h3>🎧 Nghe số tiền</h3><p class="note" style="margin:0">Máy đọc một số tiền bằng tiếng Trung, bạn chọn đúng số. ${canSpeak() ? "" : "Máy này chưa hỗ trợ đọc tiếng Trung nên bài sẽ hiện chữ Hán thay cho âm thanh."}</p><div class="actions"><button class="btn" data-act="qzStart">Bắt đầu</button></div></div></section>`;
+  const a = amountSay(q.v), done = q.pick != null;
+  return `<section class="sec"><div class="tk-box"><div class="sec-h"><h3>🎧 Số tiền là bao nhiêu?</h3><span class="meta">Đúng ${q.score}/${q.total}</span></div>
+    ${q.say ? `<button class="btn lilac qz-say" data-act="say" data-v="${esc(a.zh)}">🔊 Nghe (chạm để nghe lại)</button>` : `<div class="nr-zh">${esc(a.zh)}</div>`}
+    <div class="qz-opts">${q.opts.map((o, i) => `<button class="qz-opt ${done ? (o === q.v ? "ok" : i === q.pick ? "bad" : "") : ""}" data-act="qzPick" data-i="${i}" ${done ? "disabled" : ""}>¥ ${esc(o)}</button>`).join("")}</div>
+    ${done ? `<div class="qz-res"><b>${q.opts[q.pick] === q.v ? "✓ Đúng rồi!" : "✗ Chưa đúng"}</b>${q.say ? `<div class="nr-zh sm">${esc(a.zh)}</div>` : ""}<div class="nr-py">${esc(a.py)}</div><button class="btn small" data-act="qzNext">Câu tiếp ›</button></div>` : ""}</div></section>`;
+}
+/* --- order builder --- */
+const ORDER = [["奶茶", "nǎichá", "trà sữa", "杯", "bēi"], ["咖啡", "kāfēi", "cà phê", "杯", "bēi"], ["水", "shuǐ", "nước", "瓶", "píng"], ["啤酒", "píjiǔ", "bia", "瓶", "píng"], ["米饭", "mǐfàn", "cơm", "碗", "wǎn"], ["面", "miàn", "mì", "碗", "wǎn"], ["小笼包", "xiǎolóngbāo", "bánh bao nước", "笼", "lóng"], ["羊肉串", "yángròuchuàn", "xiên thịt cừu", "串", "chuàn"], ["包子", "bāozi", "bánh bao", "个", "ge"], ["炒饭", "chǎofàn", "cơm chiên", "份", "fèn"], ["饺子", "jiǎozi", "há cảo", "份", "fèn"], ["冰淇淋", "bīngqílín", "kem", "个", "ge"], ["门票", "ménpiào", "vé vào cổng", "张", "zhāng"], ["苹果", "píngguǒ", "táo", "斤", "jīn"]];
+function orderSay() {
+  const it = ORDER[tk.od.i], q = tk.od.q;
+  const num = fixYi((q === 2 ? [{ h: "两", p: "liǎng" }] : intTok(q)).concat([{ h: it[3], p: it[4] }])).slice(0, -1);
+  return { zh: "我要" + num.map((k) => k.h).join("") + it[3] + it[0] + "。", py: "Wǒ yào " + num.map((k) => k.p).join(" ") + " " + it[4] + " " + it[1] + ".", vi: `Tôi lấy ${q} ${it[2]}` };
+}
+function orderHtml() {
+  const o = orderSay();
+  return `<section class="sec"><div class="tk-box"><h3>🥤 Tự ghép câu gọi món</h3>
+    <div class="chips sm">${ORDER.map((x, i) => `<button class="chip" data-act="odItem" data-i="${i}" aria-pressed="${i === tk.od.i}">${esc(x[0])} · ${esc(x[2])}</button>`).join("")}</div>
+    <div class="od-q"><button class="icon-btn" data-act="odQ" data-d="-1" aria-label="Giảm">−</button><b>${tk.od.q}</b><button class="icon-btn" data-act="odQ" data-d="1" aria-label="Tăng">+</button><span class="meta">số lượng</span></div>
+    <div class="nr-zh">${esc(o.zh)}</div><div class="nr-py">${esc(o.py)}</div><p class="note" style="margin:0">${esc(o.vi)}</p>
+    <div class="actions"><button class="btn lilac" data-act="say" data-v="${esc(o.zh)}">🔊 Nghe</button><button class="btn ghost" data-act="showText" data-v="${esc(o.zh)}" data-sub="${esc(o.vi)}">Đưa nhân viên xem</button></div></div></section>`;
+}
+function numberTiles() {
+  const list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 1000];
+  return `<div class="ntiles">${list.map((n) => { const r = tokOut(intTok(n)); return `<button class="ntile" data-act="showNum" data-n="${n}"><b>${n}</b><span class="zh">${esc(r.zh)}</span><small>${esc(r.py)}</small></button>`; }).join("")}</div>`;
+}
+function numsView() {
+  const N = TK().nums, ns = tk.ns;
+  const tabs = [["learn", "📖 Học"], ["conv", "🔄 Đổi số"], ["quiz", "🎧 Luyện nghe"], ["order", "🥤 Gọi món"]];
+  const seg = `<div class="chips">${tabs.map(([k, t]) => `<button class="chip" data-act="nsec" data-v="${k}" aria-pressed="${ns === k}">${t}</button>`).join("")}</div>`;
+  let body = "";
+  if (ns === "learn") {
+    const gi = Math.min(tk.ng, N.length - 1), g = N[gi];
+    body = `<p class="note" style="margin:0">Chạm vào ô số để phóng to và nghe.</p>${numberTiles()}
+      ${N.length ? `<div class="chips">${N.map((x, i) => `<button class="chip" data-act="nsecG" data-i="${i}" aria-pressed="${i === gi}">${esc(x.icon + " " + x.title)}</button>`).join("")}</div>
+      <div class="tips">${g.items.map((t, k) => `<article class="tip t${k % 3}"><div class="tip-h"><span class="tip-ico">${esc(t.icon || g.icon || "•")}</span><h3>${esc(t.title)}</h3></div>${t.big ? `<div class="tip-big"><b>${esc(t.big)}</b>${t.cap ? `<span>${esc(t.cap)}</span>` : ""}</div>` : ""}${t.body ? prose(t.body) : ""}</article>`).join("")}</div>` : ""}`;
+  } else if (ns === "conv") {
+    body = `<section class="sec"><div class="tk-box"><h3>🔄 Số → tiếng Trung</h3><p class="note" style="margin:0">Gõ số tiền để biết người bán sẽ nói thế nào, hoặc để tự nói với họ.</p>
+      <input id="numIn" type="text" inputmode="decimal" autocomplete="off" value="${esc(tk.nin)}" aria-label="Số tiền">
+      <div class="chips sm">${[8, 15, 28, 66, 120, 350, 688, 999, 1000].map((n) => `<button class="chip" data-act="numSet" data-v="${n}">${n}</button>`).join("")}</div>
+      <div id="numOut" class="nr-box">${numResultHtml(tk.nin)}</div></div></section>`;
+  } else if (ns === "quiz") body = quizHtml();
+  else body = orderHtml();
+  return seg + body;
+}
+function wordsView() {
+  const W = TK().words, gi = tk.wg;
+  const total = W.reduce((n, g) => n + g.items.length, 0);
+  const chips = `<div class="chips"><button class="chip" data-act="wordG" data-i="-1" aria-pressed="${gi < 0}">Tất cả · ${total}</button>${W.map((g, i) => `<button class="chip" data-act="wordG" data-i="${i}" aria-pressed="${i === gi}">${esc(g.icon + " " + g.title)}</button>`).join("")}</div>`;
+  const row = (it, g, k) => `<div class="wd"><button class="wd-main" data-act="showWord" data-g="${g}" data-k="${k}"><span class="zh">${esc(it.zh)}</span><small>${esc(it.py)}</small><span>${esc(it.vi)}</span></button><button class="icon-btn wd-say" data-act="say" data-v="${esc(it.zh.replace(/…/g, ""))}" aria-label="Nghe">🔊</button></div>`;
+  return chips + `<p class="note" style="margin:0">Chạm vào chữ để phóng to cho người đối diện xem; chạm 🔊 để nghe phát âm.</p>` +
+    W.map((g, i) => [g, i]).filter(([, i]) => gi < 0 || i === gi).map(([g, i]) => `<section class="sec"><div class="sec-h"><h2>${esc(g.icon + " " + g.title)}</h2><span class="meta">${g.items.length} mục</span></div><div class="wds">${g.items.map((it, k) => row(it, i, k)).join("")}</div></section>`).join("");
+}
+function dialogsView() {
+  const G = TK().dialogs;
+  if (tk.dg < 0 || !G[tk.dg]) {
+    return `<div class="tk-grid">${G.map((g, i) => { const n = g.sections.reduce((s, x) => s + x.scenes.length, 0); return `<button class="dg-card c${i % 4}" data-act="dlgOpen" data-i="${i}"><span class="dg-ico">${esc(g.icon)}</span><span class="dg-t"><b>${esc(g.title)}</b><span>${n} mẩu · ${esc(g.sections.map((s) => s.title).join(", "))}</span></span><span class="chev">›</span></button>`; }).join("")}</div>`;
+  }
+  const g = G[tk.dg], si = tk.ds;
+  const chips = `<div class="chips"><button class="chip" data-act="dlgS" data-i="-1" aria-pressed="${si < 0}">Tất cả</button>${g.sections.map((s, i) => `<button class="chip" data-act="dlgS" data-i="${i}" aria-pressed="${i === si}">${esc(s.icon + " " + s.title)} · ${s.scenes.length}</button>`).join("")}</div>`;
+  return `<div class="tk-sub"><button class="btn small ghost" data-act="dlgBack">‹ Các nhóm hội thoại</button></div>
+    <header class="tip-hero stamp"><span class="tip-hero-ico">${esc(g.icon)}</span><div><h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p></div></header>${chips}
+    <p class="note" style="margin:0">Chạm một mẩu để mở. Chạm vào câu để phóng to và nghe.</p>
+    ${g.sections.map((s, i) => [s, i]).filter(([, i]) => si < 0 || i === si).map(([s, i]) => `<section class="sec"><div class="sec-h"><h2>${esc(s.icon + " " + s.title)}</h2><span class="meta">${s.scenes.length} mẩu</span></div>
+      ${s.scenes.map((sc, c) => `<details class="scn"><summary><span class="scn-n">${c + 1}</span><span class="scn-t"><b>${esc(sc.title)}</b><span>${esc(sc.lines[0] ? sc.lines[0].zh : "")}</span></span><span class="chev">›</span></summary>
+        ${sc.note ? prose(sc.note) : ""}<div class="chat">${sc.lines.map((l, li) => `<button class="bub ${l.me ? "me" : ""}" data-act="dlgLine" data-g="${tk.dg}" data-s="${i}" data-c="${c}" data-l="${li}"><small>${esc(l.who)}</small><span class="zh">${esc(l.zh)}</span>${l.py ? `<i>${esc(l.py)}</i>` : ""}${l.vi ? `<span>${esc(l.vi)}</span>` : ""}</button>`).join("")}</div></details>`).join("")}</section>`).join("")}`;
+}
+function viewTalk() {
+  const T = TK(), nw = T.words.reduce((n, g) => n + g.items.length, 0), nd = T.dialogs.reduce((n, g) => n + g.sections.reduce((s, x) => s + x.scenes.length, 0), 0);
+  if (!tk.sub) {
+    return `<div class="tk-hub"><p class="note" style="margin:0">Học nhanh để nghe và nói được những tình huống thường gặp. Chọn một mục:</p>
+      <button class="tk-card stamp a" data-act="tkOpen" data-v="words"><span class="tk-n">1</span><span class="tk-t"><b>Từ cơ bản</b><span>${nw} từ và cụm từ cần nhất, chia theo nhóm</span></span><span class="chev">›</span></button>
+      <button class="tk-card stamp b" data-act="tkOpen" data-v="nums"><span class="tk-n">2</span><span class="tk-t"><b>Cách đếm số</b><span>Nghe và nói số tiền 1–1000 tệ, gọi món theo số lượng</span></span><span class="chev">›</span></button>
+      <button class="tk-card stamp c" data-act="tkOpen" data-v="dlg"><span class="tk-n">3</span><span class="tk-t"><b>Hội thoại điển hình</b><span>${nd} mẩu: di chuyển, ăn uống, cà phê – trà sữa, hỏi đường</span></span><span class="chev">›</span></button></div>`;
+  }
+  const meta = { words: ["Từ cơ bản", wordsView], nums: ["Cách đếm số", numsView], dlg: ["Hội thoại điển hình", dialogsView] }[tk.sub];
+  return `<div class="tk-page"><div class="tk-sub"><button class="btn small ghost" data-act="tkBack">‹ Tiếng Trung</button><h2>${meta[0]}</h2></div>${meta[1]()}</div>`;
 }
 function drawReader() {
   const el = $("#rd");
   if (!reader) { if (!el.hidden) { el.hidden = true; if (!detailId) document.body.style.overflow = ""; } return; }
   let html;
-  if (reader.mode === "dlg") html = dialogsHtml();
-  else {
+  {
     const b = bookOf(reader.key), n = b.chapters.length;
     if (reader.mode === "ch" && !n) reader.mode = "toc";
     if (reader.mode === "toc") {
@@ -1464,16 +1663,13 @@ function shopSheet(k) {
     <div class="sheet-actions"><span class="grow"></span><button class="btn small ghost" data-act="closeSheet">Đóng</button></div>`);
 }
 function viewInfo() {
-  const I = D.info, nd = (I.dialogs || []).length;
-  const ph = `<section class="sec"><div class="sec-h"><h2>Câu tiếng Trung hay dùng</h2></div><p class="note" style="margin-top:-6px">Chạm để phóng to cho người bán hàng hoặc tài xế xem.</p>
-    <div class="phrases">${PHRASES.map((p, i) => `<button class="phrase" data-act="showPhrase" data-i="${i}"><span class="zh">${p[0]}</span><small>${p[1]}</small><span>${p[2]}</span></button>`).join("")}</div>
-    <button class="btn lilac dlg-btn" data-act="openDialogs">💬 Hội thoại mẫu theo tình huống${nd ? ` · ${nd}` : " · sắp có"}</button></section>`;
+  const I = D.info;
   const sos = `<section class="sec"><div class="sec-h"><h2>Số khẩn cấp ở Trung Quốc</h2></div><div class="sos"><div><b>110</b><span>Cảnh sát</span></div><div><b>120</b><span>Cấp cứu</span></div><div><b>119</b><span>Cứu hoả</span></div></div></section>`;
   const rate = `<section class="sec"><div class="sec-h"><h2>Tỷ giá</h2></div><div class="card"><div class="money"><b>¥100</b><span>≈ ${fmtNum(Math.round(100 * (I.rate || 3650)))} ₫</span></div><span class="meta">1 ¥ = ${fmtNum(I.rate || 3650)} ₫</span></div></section>`;
   const offl = `<section class="sec"><div class="sec-h"><h2>Lưu offline</h2></div>${offlineCard()}</section>`;
   return grpHead(1, "Thông tin điểm đến", "Hiểu về hai thành phố và từng địa điểm", "dest") + learnCard()
     + grpHead(2, "Thông tin du lịch", "Khách sạn, di chuyển, lưu ý và câu cần dùng", "trav")
-    + bookingsSec() + tipsSec() + ph + rate + sos + offl + playlistSec() + giftsSec();
+    + bookingsSec() + tipsSec() + rate + sos + offl + playlistSec() + giftsSec();
 }
 
 /* ---------- detail ---------- */
@@ -1613,8 +1809,8 @@ function drawLb() {
 }
 
 /* ---------- overlays ---------- */
-function show(big, sub, vi, subZh) {
-  $("#show").innerHTML = `<div class="big">${esc(big)}</div>${sub ? `<div class="sub ${subZh ? "zh" : ""}">${esc(sub)}</div>` : ""}${vi ? `<div class="vi">${esc(vi)}</div>` : ""}<div class="hint">Chạm để đóng</div>`;
+function show(big, sub, vi, subZh, say) {
+  $("#show").innerHTML = `<div class="big">${esc(big)}</div>${sub ? `<div class="sub ${subZh ? "zh" : ""}">${esc(sub)}</div>` : ""}${vi ? `<div class="vi">${esc(vi)}</div>` : ""}${say && canSpeak() ? `<span class="say-btn" role="button" data-act="say" data-v="${esc(say)}">🔊 Nghe</span>` : ""}<div class="hint">Chạm để đóng</div>`;
   $("#show").hidden = false;
 }
 let toastT;
@@ -1655,6 +1851,7 @@ function drawSearch(q) {
 window.addEventListener("scroll", () => { const b = $("#totop"), h = window.scrollY < 900; if (b && b.hidden !== h) b.hidden = h; }, { passive: true });
 
 /* ---------- events ---------- */
+document.addEventListener("input", (e) => { if (e.target && e.target.id === "numIn") { tk.nin = e.target.value; $("#numOut").innerHTML = numResultHtml(tk.nin); } });
 function setTab(t) { ui.tab = t; if (t === "places") { ui.pcity = null; ui.route = ""; ui.mapSel = null; } try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo(0, 0); }
 document.addEventListener("click", (e) => {
   const tabEl = e.target.closest("[data-tab]");
@@ -1670,9 +1867,24 @@ document.addEventListener("click", (e) => {
     case "closeDetail": closeDetail(); break;
     case "openBook": reader = { key: el.dataset.key, i: 0, mode: "toc" }; drawReader(); break;
     case "readCh": reader = { key: el.dataset.key, i: +el.dataset.i, mode: "ch" }; drawReader(); break;
-    case "openDialogs": reader = { mode: "dlg", g: 0 }; drawReader(); break;
-    case "dlgG": reader.g = +el.dataset.i; drawReader(); break;
-    case "dlgLine": { const g = (D.info.dialogs || [])[reader.g || 0], l = g && g.scenes[+el.dataset.s] && g.scenes[+el.dataset.s].lines[+el.dataset.l]; if (l) show(l.zh, l.py, l.vi); break; }
+    case "say": speak(el.dataset.v); break;
+    case "tkOpen": tk.sub = el.dataset.v; window.scrollTo(0, 0); render(); break;
+    case "tkBack": tk.sub = null; tk.dg = -1; window.scrollTo(0, 0); render(); break;
+    case "wordG": tk.wg = +el.dataset.i; render(); break;
+    case "showWord": { const it = TK().words[+el.dataset.g].items[+el.dataset.k]; show(it.zh, it.py, it.vi, false, it.zh.replace(/…/g, "")); break; }
+    case "showNum": { const n = +el.dataset.n, r = tokOut(intTok(n)); show(r.zh, r.py, String(n), false, r.zh); speak(r.zh); break; }
+    case "nsec": tk.ns = el.dataset.v; render(); break;
+    case "nsecG": tk.ng = +el.dataset.i; render(); break;
+    case "numSet": { tk.nin = el.dataset.v; const i = $("#numIn"); if (i) i.value = tk.nin; $("#numOut").innerHTML = numResultHtml(tk.nin); break; }
+    case "qzStart": newQuiz(false); render(); speak(amountSay(tk.qz.v).zh); break;
+    case "qzNext": newQuiz(true); render(); speak(amountSay(tk.qz.v).zh); break;
+    case "qzPick": { const q = tk.qz; if (q.pick != null) break; q.pick = +el.dataset.i; q.total++; if (q.opts[q.pick] === q.v) q.score++; render(); break; }
+    case "odItem": tk.od.i = +el.dataset.i; render(); break;
+    case "odQ": tk.od.q = Math.max(1, Math.min(99, tk.od.q + +el.dataset.d)); render(); break;
+    case "dlgOpen": tk.dg = +el.dataset.i; tk.ds = -1; window.scrollTo(0, 0); render(); break;
+    case "dlgBack": tk.dg = -1; window.scrollTo(0, 0); render(); break;
+    case "dlgS": tk.ds = +el.dataset.i; render(); break;
+    case "dlgLine": { const sc = TK().dialogs[+el.dataset.g].sections[+el.dataset.s].scenes[+el.dataset.c], l = sc.lines[+el.dataset.l]; if (l) show(l.zh, l.py, l.vi, false, l.zh); break; }
     case "tipG": ui.tipG = +el.dataset.i; render(); break;
     case "amapAddr": { const v = el.dataset.v; openAmap({ name: el.dataset.sub, addrZh: v, city: v.includes("上海") ? "sh" : "hz" }); break; }
     case "homeFullMap": Object.assign(ui, { tab: "places", pcity: meCity(), view: "map", route: "", mapSel: null }); try { history.replaceState(null, "", "#places"); } catch (e) {} render(); window.scrollTo(0, 0); break;
@@ -1682,7 +1894,6 @@ document.addEventListener("click", (e) => {
     case "detailMode": { if (detailMode !== el.dataset.v) { detailMode = el.dataset.v; const box = $("#detail"), m = box.querySelector(".d-mode"), y = m ? m.offsetTop - 70 : 0; renderDetail(); if (box.scrollTop > y) box.scrollTop = Math.max(0, y); } break; }
     case "showPlace": { const p = PL[id]; if (p) show(p.zh || p.name, p.addrZh || p.area, p.name, !!p.addrZh); break; }
     case "showText": show(el.dataset.v, "", el.dataset.sub); break;
-    case "showPhrase": { const p = PHRASES[+el.dataset.i]; show(p[0], p[1], p[2]); break; }
     case "showDish": { const d = PL[detailId] && PL[detailId].dishes[+el.dataset.i]; if (d && d.zh) show(d.zh, d.py, d.vi); break; }
     case "hideShow": $("#show").hidden = true; break;
     case "lbOpen": { const p = PL[detailId]; if (p) { lb = { ids: p.photos, i: +el.dataset.i }; drawLb(); } break; }
