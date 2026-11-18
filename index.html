@@ -105,6 +105,9 @@ main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 .pcard .pc-meta{font-size:13px;font-weight:600;opacity:.9;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
 .pcard .pc-meta .pill{border:1.5px solid currentColor;border-radius:99px;padding:0 8px;font-size:12px}
 .pcard .pc-meta .pill.dash{border-style:dashed;opacity:.85}
+.queue-warn{display:flex;gap:8px;align-items:flex-start;background:#FFE7A8;color:#4A3000;border:2px solid #D99A00;border-radius:12px;padding:8px 10px;font-size:14px;font-weight:700;line-height:1.35}
+.queue-warn .qi{flex:none;font-size:16px;line-height:1.2}
+.queue-warn b{font-weight:900}
 .pcard .note{color:var(--hero-ink);opacity:.88}
 .pcard .check{background:transparent;border-color:var(--hero-ink);color:var(--hero-num-ink)}
 .pcard .check[aria-pressed="true"]{background:var(--hero-num);border-color:var(--hero-num)}
@@ -325,6 +328,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--grass);outline:none}
 .stop-note .pimgs button,.stop-note .pimgs.n1 button{aspect-ratio:3/4}
 .stop-note .pimgs.n1{max-width:62%}
 .pimgs img{width:100%;height:100%;object-fit:cover;display:block}
+.pimgs.full button,.pimgs.n1.full button{aspect-ratio:auto;width:100%;max-width:300px;justify-self:center}
+.pimgs.full img{height:auto}
 .prose blockquote{margin:2px 0;padding:10px 14px;border-left:4px solid var(--line);background:var(--surface-2);border-radius:0 12px 12px 0;font-size:16px;line-height:1.7}
 .d-mode{position:sticky;top:64px;z-index:3;box-shadow:var(--shadow)}
 .toc{display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden}
@@ -745,6 +750,9 @@ h1,h2,h3,.pc-name,.hero-title,.dish-b b,.phrase span,.day-head p{text-wrap:balan
 .tip-now{display:flex;align-items:baseline;gap:8px;padding:2px 2px 0;font-size:17px}
 .tip-now b{font-family:var(--f-display);font-weight:800}
 .tip-now small{font-size:12px;font-weight:700;color:var(--ink-soft)}
+
+/* one-colour emoji: the glyph is drawn as a silhouette in the current text colour */
+.emo{-webkit-text-fill-color:transparent;text-shadow:0 0 0 currentColor;font-style:normal}
 </style>
 </head>
 <body>
@@ -911,6 +919,30 @@ function vnWrap(root) {
   const nodes = [];
   while (walk.nextNode()) nodes.push(walk.currentNode);
   for (const n of nodes) { const v = vnGlue(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; }
+  monoEmoji(root);
+}
+/* emoji in the data (🧳, 🚄, 👋…) are shown as one-colour icons in the colour of the text around them */
+const EMOJI_RE = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}{2})(?:️|‍\p{Extended_Pictographic}|\p{Emoji_Modifier})*/gu;
+function monoEmoji(root) {
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (!n.parentElement || /^(SCRIPT|STYLE|TEXTAREA|OPTION)$/.test(n.parentElement.tagName) || n.parentElement.classList.contains("emo") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const nodes = [];
+  while (walk.nextNode()) { EMOJI_RE.lastIndex = 0; if (EMOJI_RE.test(walk.currentNode.nodeValue)) nodes.push(walk.currentNode); }
+  for (const n of nodes) {
+    const t = n.nodeValue, frag = document.createDocumentFragment();
+    let last = 0;
+    EMOJI_RE.lastIndex = 0;
+    for (const m of t.matchAll(EMOJI_RE)) {
+      if (/^[✓✕✗☰⚠]/u.test(m[0]) && !/️/.test(m[0])) continue; // plain text symbols are already one colour
+      if (m.index > last) frag.append(t.slice(last, m.index));
+      const s = document.createElement("span"); s.className = "emo"; s.textContent = m[0].replace(/️/g, "");
+      frag.append(s); last = m.index + m[0].length;
+    }
+    if (last === 0) continue;
+    if (last < t.length) frag.append(t.slice(last));
+    n.replaceWith(frag);
+  }
 }
 
 function offlineCard() {
@@ -963,6 +995,8 @@ function homeNear() {
 const todayCity = () => { const c = planItems().filter((p) => p.day === (currentDay() || 1)).map((p) => p.city).find(Boolean); return c === "hz" ? "hz" : "sh"; };
 const meCity = () => (me && inCityBox("hz", [me.lat, me.lng]) ? "hz" : me && inCityBox("sh", [me.lat, me.lng]) ? "sh" : todayCity());
 
+// 'Xếp hàng:' line in the place file: a loud amber warning on the card and at the top of the detail page
+const queueWarn = (p) => (p.queue ? `<div class="queue-warn" role="note"><span class="qi" aria-hidden="true">⏳</span><span><b>Hay phải xếp hàng:</b> ${esc(p.queue)}</span></div>` : "");
 function placeCard(p, o = {}) {
   const done = isDone(p.id);
   const pc = p.city === "both" ? (ui.pcity === "hz" ? "hz" : ui.pcity === "sh" ? "sh" : "") : p.city;
@@ -978,6 +1012,7 @@ function placeCard(p, o = {}) {
       <button class="check" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}" aria-label="Đánh dấu đã đi">${ICON_CHECK}</button>
     </div>
     <div class="pc-meta">${p.city ? `<span>${CITIES[p.city]}</span><span>·</span>` : ""}<span>${CATS[p.cat] || "Khác"}</span>${p.area ? `<span>·</span><span>${esc(p.area)}</span>` : ""}${p.must ? '<span class="pill">Phải đi</span>' : ""}${chain}${inside}${(p.poses || []).length ? `<span class="pill">${p.poses.length} dáng chụp</span>` : ""}${p.sample ? '<span class="pill dash">Gợi ý</span>' : ""}</div>
+    ${queueWarn(p)}
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
     ${(o.img || placeImg(p)) ? `<button class="card-main" data-act="photo" data-v="${o.img || placeImg(p)}" aria-label="Xem ảnh ${esc(p.name)}"><img class="pc-img" src="${o.img || placeImg(p)}" alt="" loading="lazy"></button>` : ""}
     ${o.stopNote ? `<div class="note stop-note"><b>Ở cung này:</b>${prose(o.stopNote)}</div>` : ""}
@@ -1692,7 +1727,8 @@ const rt = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
 function prose(text) {
   let html = "", ul = [], tbl = [], qt = [], im = [];
   const flush = () => {
-    if (im.length) { const n = Math.min(im.length, 3); html += `<div class="pimgs n${n}">${im.map((x) => `<button data-act="lbImg" data-v="${esc(x.u)}" aria-label="Xem ảnh${x.alt ? ": " + esc(x.alt) : ""}"><img src="${esc(x.u)}" alt="${esc(x.alt)}" loading="lazy"></button>`).join("")}</div>`; im = []; }
+    // '![nguyên ảnh](…)' = show the whole picture uncropped (phone screenshots for step-by-step guides)
+    if (im.length) { const n = Math.min(im.length, 3), full = im.every((x) => /^nguyên ảnh/i.test(x.alt || "")); html += `<div class="pimgs n${n}${full ? " full" : ""}">${im.map((x) => `<button data-act="lbImg" data-v="${esc(x.u)}" aria-label="Xem ảnh${x.alt ? ": " + esc(x.alt) : ""}"><img src="${esc(x.u)}" alt="${esc(x.alt)}" loading="lazy"></button>`).join("")}</div>`; im = []; }
     if (qt.length) { html += `<blockquote>${qt.map(rt).join("<br>")}</blockquote>`; qt = []; }
     if (ul.length) { html += `<ul>${ul.map((l) => `<li>${rt(l)}</li>`).join("")}</ul>`; ul = []; }
     if (tbl.length) { html += `<div class="tbl"><table>${tbl.map((r, i) => `<tr>${r.map((c) => (i === 0 ? `<th>${rt(c)}</th>` : `<td>${rt(c)}</td>`)).join("")}</tr>`).join("")}</table></div>`; tbl = []; }
@@ -1750,7 +1786,7 @@ function renderDetail() {
       <span class="grow"></span>
       <button class="btn small ${done ? "" : "ghost"}" data-act="togglePlace" data-id="${p.id}" aria-pressed="${done}">${done ? "✓ Đã ghé" : "Đánh dấu đã ghé"}</button>
     </div></div>
-    <div class="wrap"><div class="d-body">${gal}${head}${modeSeg}${learn ? learnBody : `${rel}${status}${intro}${insideSec}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}`}</div></div>`;
+    <div class="wrap"><div class="d-body">${gal}${head}${modeSeg}${learn ? learnBody : `${rel}${status}${queueWarn(p)}${intro}${insideSec}${poseSection(p)}${dishSec}${addr}${when}${secs}${foot}`}</div></div>`;
   vnWrap(box);
   if (wasHidden) { box.hidden = false; box.scrollTop = 0; document.body.style.overflow = "hidden"; } else box.scrollTop = sc;
 }
