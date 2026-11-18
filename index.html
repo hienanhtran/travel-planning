@@ -1441,7 +1441,7 @@ function giftsSec() {
 function shopHtml(sh, gi) {
   const cityZh = sh.addrZh.includes("上海") ? "sh" : "hz";
   const row = (k, v) => (v ? `<div class="gs-row"><b>${k}:</b> ${esc(v)}</div>` : "");
-  return `<div class="gs-shop"><h3>🎁 ${esc(sh.name)}</h3>${sh.addrZh ? `<div class="zh">${esc(sh.addrZh)}</div>` : ""}${row("Địa chỉ", sh.addr)}${row("Giờ mở", sh.hours)}${row("Đi bằng", sh.transit)}${sh.note ? prose(sh.note) : ""}
+  return `<div class="gs-shop">${sh.photo ? `<button class="card-main" data-act="photo" data-v="${sh.photo}" aria-label="Xem ảnh cửa hàng"><img class="gs-img" src="${sh.photo}" alt="" loading="lazy"></button>` : ""}<h3>🎁 ${esc(sh.name)}</h3>${sh.addrZh ? `<div class="zh">${esc(sh.addrZh)}</div>` : ""}${row("Địa chỉ", sh.addr)}${row("Giờ mở", sh.hours)}${row("Đi bằng", sh.transit)}${sh.note ? prose(sh.note) : ""}
     <div class="actions">${sh.addrZh ? `<button class="btn small lilac" data-act="showText" data-v="${esc(sh.addrZh)}" data-sub="${esc(sh.zh || sh.name)}">Đưa tài xế xem</button>` : ""}
     <button class="btn small ghost" data-act="giftAmap" data-i="${gi}" data-k="${esc(sh.zh || sh.addrZh)}">Mở Amap</button>${sh.addrZh ? `<button class="btn small ghost" data-act="copy" data-v="${esc(sh.addrZh)}">Sao chép</button>` : ""}</div></div>`;
 }
