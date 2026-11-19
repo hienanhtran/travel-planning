@@ -1376,7 +1376,7 @@ function tlItem(p) {
   const place = p.place && PL[p.place];
   const cd = currentDay();
   return `<div class="tl-item ${cd && p.day < cd ? "past" : ""}">
-    <div class="tl-time">${esc(p.time || "–")}</div>
+    <div class="tl-time">${p.hideTime ? "" : esc(p.time || "–")}</div>
     <div class="tl-rail"><i></i></div>
     <div class="tl-card card">
       <div class="card-main"><h3>${esc(p.title)}</h3>${place && place.zh ? `<div class="zh">${esc(place.zh)}${place.py ? ` <span class="py">${esc(place.py)}</span>` : ""}</div>` : ""}</div>
