@@ -161,6 +161,7 @@ main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 .card h3{margin:0;font-size:16px;font-weight:700;line-height:1.3}
 .card.done h3{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--grass)}
 .card .zh{font-size:15px;color:var(--lilac-deep);font-weight:600}
+.card .zh .py{display:block;font-size:13px;font-style:italic;font-weight:500;color:var(--ink-soft)}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--ink-soft)}
 .tag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;background:var(--surface-2);color:var(--ink);font-size:12px;font-weight:600}
 .tag.city-sh{background:var(--lime);color:var(--on-lime)}
@@ -1373,7 +1374,7 @@ function tlItem(p) {
     <div class="tl-time">${esc(p.time || "–")}</div>
     <div class="tl-rail"><i></i></div>
     <div class="tl-card card">
-      <div class="card-main"><h3>${esc(p.title)}</h3>${place && place.zh ? `<div class="zh">${esc(place.zh)}</div>` : ""}</div>
+      <div class="card-main"><h3>${esc(p.title)}</h3>${place && place.zh ? `<div class="zh">${esc(place.zh)}${place.py ? ` <span class="py">${esc(place.py)}</span>` : ""}</div>` : ""}</div>
       ${p.city || p.move ? `<div class="meta">${p.city ? `<span class="tag city-${p.city}">${CITIES[p.city]}</span>` : ""}${p.move ? `<span>${esc(p.move)}</span>` : ""}</div>` : ""}
       ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
       ${place ? `<div class="actions"><button class="btn small lilac" data-act="openPlace" data-id="${place.id}">Chi tiết</button>${place.zh || place.addrZh ? `<button class="btn small ghost" data-act="showPlace" data-id="${place.id}">Đưa tài xế xem</button>` : ""}<button class="btn small ghost" data-act="amap" data-id="${place.id}">Mở Amap</button></div>` : ""}
